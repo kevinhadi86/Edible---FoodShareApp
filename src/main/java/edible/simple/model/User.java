@@ -24,7 +24,7 @@ import javax.validation.constraints.Size;
                 "email"
         })
 })
-public class User{
+public class User extends DataAudit{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
