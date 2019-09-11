@@ -16,6 +16,6 @@ import java.util.Optional;
  * @version $Id: RoleRepository.java, v 0.1 2019‐09‐11 15:15 Kevin Hadinata Exp $$
  */
 @Repository
-public interface RoleRepository extends JpaRepository<Role, Integer> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
     Optional<Role> findByName(RoleName roleName);
 }

@@ -16,7 +16,7 @@ import java.util.Optional;
  * @version $Id: UserRepository.java, v 0.1 2019‐09‐11 15:13 Kevin Hadinata Exp $$
  */
 @Repository
-public interface UserRepository extends JpaRepository<User,Integer> {
+public interface UserRepository extends JpaRepository<User,Long> {
 
     Optional<User> findByEmail(String email);
 
