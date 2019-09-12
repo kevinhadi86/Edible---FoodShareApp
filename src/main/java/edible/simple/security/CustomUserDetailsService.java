@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Kevin Hadinata
  * @version $Id: CustomUserDetailsService.java, v 0.1 2019‐09‐11 18:28 Kevin Hadinata Exp $$
  */
-
+@Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
