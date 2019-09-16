@@ -4,14 +4,18 @@
  */
 package edible.simple.security;
 
-import io.jsonwebtoken.*;
+import java.util.Date;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import edible.simple.model.User;
+import edible.simple.repository.UserRepository;
+import io.jsonwebtoken.*;
 
 /**
  * @author Kevin Hadinata
@@ -26,19 +30,22 @@ public class JwtTokenProvider {
     private String              jwtSecret;
 
     @Value("${app.jwtExpirationInMs}")
-    private int                 jwtExpirationInMs;
+    private long                 jwtExpirationInMs;
 
-    public String generateToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+    @Autowired
+    UserRepository userRepository;
 
-        Date now = new Date();
-        Date expirtDate = new Date(now.getTime() + jwtExpirationInMs);
-
-        String token = Jwts.builder().setSubject(Long.toString(userPrincipal.getId()))
-            .setIssuedAt(new Date()).setExpiration(expirtDate)
-            .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
-
-        return token;
+    public String generateToken(String usernameOrEmail) {
+        Optional<User> user = userRepository.findByUsernameOrEmail(usernameOrEmail,usernameOrEmail);
+        if(user.isPresent()){
+            User userValue = user.get();
+            Date now = new Date();
+            Date expirtDate = new Date(now.getTime() + jwtExpirationInMs);
+            return Jwts.builder().setSubject(Long.toString(userValue.getId()))
+                    .setIssuedAt(new Date()).setExpiration(expirtDate)
+                    .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+        }
+        return null;
     }
 
     public Long getUserIdFromJWT(String token) {

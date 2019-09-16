@@ -4,34 +4,30 @@
  */
 package edible.simple.controller;
 
-import edible.simple.exception.AppException;
-import edible.simple.model.Role;
-import edible.simple.model.RoleName;
-import edible.simple.model.User;
-import edible.simple.payload.ApiResponse;
-import edible.simple.payload.JwtAuthenticationResponse;
-import edible.simple.payload.LoginRequest;
-import edible.simple.payload.SignUpRequest;
-import edible.simple.repository.RoleRepository;
-import edible.simple.repository.UserRepository;
-import edible.simple.security.JwtTokenProvider;
+import java.util.Date;
+
+import javax.validation.Valid;
+
+import edible.simple.payload.auth.JwtAuthenticationResponse;
+import edible.simple.payload.auth.LoginRequest;
+import edible.simple.payload.auth.ResetPasswordRequest;
+import edible.simple.payload.auth.SignUpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
-import java.net.URI;
-import java.util.Collections;
+import edible.simple.model.User;
+import edible.simple.payload.*;
+import edible.simple.repository.RoleRepository;
+import edible.simple.security.JwtTokenProvider;
+import edible.simple.service.AuthService;
 
 /**
  * @author Kevin Hadinata
@@ -42,59 +38,46 @@ import java.util.Collections;
 public class AuthController {
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    AuthenticationManager    authenticationManager;
 
     @Autowired
-    UserRepository        userRepository;
+    AuthService              authService;
 
     @Autowired
-    RoleRepository        roleRepository;
+    RoleRepository           roleRepository;
 
     @Autowired
-    PasswordEncoder       passwordEncoder;
+    PasswordEncoder          passwordEncoder;
 
     @Autowired
-    JwtTokenProvider      jwtTokenProvider;
+    JwtTokenProvider         jwtTokenProvider;
+
+    @Autowired
+    JavaMailSender           javaMailSender;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager
-            .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(),
-                loginRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String jwt = jwtTokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+    public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        String token = authService.authenticateUser(loginRequest);
+        return ResponseEntity.ok(new JwtAuthenticationResponse(token));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return new ResponseEntity(new ApiResponse(false, "Username is already taken!"),
-                HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+        return authService.registerUser(signUpRequest);
+    }
+
+    @PostMapping("/sendResetPasswordMail")
+    public ResponseEntity<ApiResponse> sendResetPasswordMail(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        User user = authService.getUserByEmail(resetPasswordRequest.getEmail());
+        if (user != null) {
+            Date now = new Date();
+            String newPassword = Long.toString(now.getTime());
+            user.setPassword(passwordEncoder.encode(newPassword));
+            authService.saveUser(user);
+            authService.sendResetPasswordEmail(user.getEmail(), newPassword);
+            return new ResponseEntity(new ApiResponse(true,"Reset password email sent successfully"),HttpStatus.OK);
         }
-        if (userRepository.existsByEmail((signUpRequest.getEmail()))) {
-            return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
-                HttpStatus.BAD_REQUEST);
-        }
-
-        User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
-            signUpRequest.getEmail(), signUpRequest.getUsername(), signUpRequest.getPhonenumber());
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-            .orElseThrow(() -> new AppException("User Role not set."));
-
-        user.setRoles(Collections.singleton(userRole));
-
-        User result = userRepository.save(user);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-            .path("/api/users/{username}").buildAndExpand(result.getUsername()).toUri();
-
-        return ResponseEntity.created(location)
-            .body(new ApiResponse(true, "User registered successfully"));
+        return new ResponseEntity(new ApiResponse(false, "Email not Exists"),
+            HttpStatus.BAD_REQUEST);
     }
 }
