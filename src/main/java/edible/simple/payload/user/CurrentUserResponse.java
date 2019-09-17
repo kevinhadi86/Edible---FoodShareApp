@@ -1,6 +1,4 @@
-package edible.simple.payload.auth;
-
-import edible.simple.model.User;
+package edible.simple.payload.user;
 
 public class CurrentUserResponse{
     private Long id;
@@ -13,17 +11,6 @@ public class CurrentUserResponse{
     private int rating;
 
     public CurrentUserResponse() {
-    }
-
-    public CurrentUserResponse(Long id, String username, String name, String email, String imageurl, String bio, String phonenumber, int rating) {
-        this.id = id;
-        this.username = username;
-        this.name = name;
-        this.email = email;
-        this.imageurl = imageurl;
-        this.bio = bio;
-        this.phonenumber = phonenumber;
-        this.rating = rating;
     }
 
     public Long getId() {

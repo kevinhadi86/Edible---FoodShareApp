@@ -4,11 +4,12 @@
  */
 package edible.simple.service;
 
+import org.springframework.http.ResponseEntity;
+
 import edible.simple.model.User;
 import edible.simple.payload.ApiResponse;
 import edible.simple.payload.auth.LoginRequest;
 import edible.simple.payload.auth.SignUpRequest;
-import org.springframework.http.ResponseEntity;
 
 /**
  * @author Kevin Hadinata

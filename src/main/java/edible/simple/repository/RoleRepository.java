@@ -4,12 +4,13 @@
  */
 package edible.simple.repository;
 
-import edible.simple.model.Role;
-import edible.simple.model.RoleName;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import edible.simple.model.Role;
+import edible.simple.model.RoleName;
 
 /**
  * @author Kevin Hadinata

@@ -4,9 +4,9 @@
  */
 package edible.simple.security;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
 import java.lang.annotation.*;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 /**
  * @author Kevin Hadinata

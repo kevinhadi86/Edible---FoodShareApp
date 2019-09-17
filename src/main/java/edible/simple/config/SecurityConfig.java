@@ -4,9 +4,6 @@
  */
 package edible.simple.config;
 
-import edible.simple.security.CustomUserDetailsService;
-import edible.simple.security.JwtAuthenticationEntryPoint;
-import edible.simple.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +19,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import edible.simple.security.CustomUserDetailsService;
+import edible.simple.security.JwtAuthenticationEntryPoint;
+import edible.simple.security.JwtAuthenticationFilter;
 
 /**
  * @author Kevin Hadinata

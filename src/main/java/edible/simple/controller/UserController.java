@@ -4,12 +4,6 @@
  */
 package edible.simple.controller;
 
-import edible.simple.model.User;
-import edible.simple.payload.auth.ChangeProfileRequest;
-import edible.simple.payload.auth.CurrentUserResponse;
-import edible.simple.security.CurrentUser;
-import edible.simple.security.UserPrincipal;
-import edible.simple.service.AuthService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import edible.simple.model.User;
+import edible.simple.payload.user.ChangeProfileRequest;
+import edible.simple.payload.user.CurrentUserResponse;
+import edible.simple.security.CurrentUser;
+import edible.simple.security.UserPrincipal;
+import edible.simple.service.AuthService;
 
 /**
  * @author Kevin Hadinata

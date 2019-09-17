@@ -8,20 +8,23 @@ import java.util.Date;
 
 import javax.validation.Valid;
 
-import edible.simple.payload.ApiResponse;
-import edible.simple.payload.auth.JwtAuthenticationResponse;
-import edible.simple.payload.auth.LoginRequest;
-import edible.simple.payload.auth.ResetPasswordRequest;
-import edible.simple.payload.auth.SignUpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import edible.simple.model.User;
+import edible.simple.payload.ApiResponse;
+import edible.simple.payload.auth.JwtAuthenticationResponse;
+import edible.simple.payload.auth.LoginRequest;
+import edible.simple.payload.auth.ResetPasswordRequest;
+import edible.simple.payload.auth.SignUpRequest;
 import edible.simple.repository.RoleRepository;
 import edible.simple.security.JwtTokenProvider;
 import edible.simple.service.AuthService;

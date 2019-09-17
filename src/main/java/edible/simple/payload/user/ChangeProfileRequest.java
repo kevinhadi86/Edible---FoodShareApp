@@ -2,7 +2,7 @@
  * Alipay.com Inc.
  * Copyright (c) 2004‐2019 All Rights Reserved.
  */
-package edible.simple.payload.auth;
+package edible.simple.payload.user;
 
 import javax.validation.constraints.NotBlank;
 
