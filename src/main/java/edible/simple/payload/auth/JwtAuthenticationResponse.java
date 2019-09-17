@@ -10,11 +10,21 @@ package edible.simple.payload.auth;
  */
 public class JwtAuthenticationResponse {
 
+    private boolean success;
     private String accessToken;
     private String tokenType = "Bearer";
 
-    public JwtAuthenticationResponse(String accessToken) {
+    public JwtAuthenticationResponse(boolean success, String accessToken) {
+        this.success = success;
         this.accessToken = accessToken;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     public String getAccessToken() {

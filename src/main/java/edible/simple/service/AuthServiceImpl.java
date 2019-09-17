@@ -52,7 +52,12 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public String authenticateUser(LoginRequest loginRequest) {
-        return jwtTokenProvider.generateToken(loginRequest.getUsernameOrEmail());
+        String token = null;
+        Optional<User> user = userRepository.findByUsernameOrEmail(loginRequest.getUsernameOrEmail(),loginRequest.getUsernameOrEmail());
+        if(user.isPresent() && passwordEncoder.matches(loginRequest.getPassword(),user.get().getPassword())){
+            token = jwtTokenProvider.generateToken(loginRequest.getUsernameOrEmail());
+        }
+        return token;
     }
 
     @Override
@@ -67,7 +72,7 @@ public class AuthServiceImpl implements AuthService{
         }
 
         User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
-                signUpRequest.getEmail(), signUpRequest.getUsername(), signUpRequest.getPhonenumber());
+                signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getPhonenumber());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 

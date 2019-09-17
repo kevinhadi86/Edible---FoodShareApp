@@ -55,7 +55,10 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         String token = authService.authenticateUser(loginRequest);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+        if(token != null){
+            return ResponseEntity.ok(new JwtAuthenticationResponse(true, token));
+        }
+        return new ResponseEntity(new ApiResponse(false,"Username or Email or Password is Wrong"), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/signup")
