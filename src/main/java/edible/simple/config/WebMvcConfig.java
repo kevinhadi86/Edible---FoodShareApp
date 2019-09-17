@@ -4,6 +4,7 @@
  */
 package edible.simple.config;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Kevin Hadinata
  * @version $Id: WebMvcConfig.java, v 0.1 2019‐09‐12 19:23 Kevin Hadinata Exp $$
  */
+@Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final long MAX_AGE_SECS = 3600;

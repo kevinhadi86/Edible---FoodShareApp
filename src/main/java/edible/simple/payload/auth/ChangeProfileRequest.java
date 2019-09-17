@@ -8,12 +8,15 @@ import javax.validation.constraints.NotBlank;
 
 /**
  * @author Kevin Hadinata
- * @version $Id: ChangePasswordRequest.java, v 0.1 2019‐09‐16 13:31 Kevin Hadinata Exp $$
+ * @version $Id: ChangeProfileRequest.java, v 0.1 2019‐09‐16 13:31 Kevin Hadinata Exp $$
  */
-public class ChangePasswordRequest {
+public class ChangeProfileRequest {
 
     @NotBlank
     private long id;
+
+    private String username;
+    private String email;
 
     @NotBlank
     private String password;

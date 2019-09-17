@@ -17,8 +17,6 @@ import java.util.TimeZone;
 })
 public class SimpleApplication {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleApplication.class);
-
 	@PostConstruct
 	void init() {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
