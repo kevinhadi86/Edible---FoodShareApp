@@ -12,6 +12,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.NaturalId;
 
 /**
@@ -19,46 +22,48 @@ import org.hibernate.annotations.NaturalId;
  * @version $Id: User.java, v 0.1 2019‐09‐11 11:59 Kevin Hadinata Exp $$
  */
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "username"
-        }),
-        @UniqueConstraint(columnNames = {
-                "email"
-        })
-})
-public class User extends DataAudit{
+@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "username" }),
+                                             @UniqueConstraint(columnNames = { "email" }) })
+public class User extends DataAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long          id;
     @NotBlank
     @Size(max = 255)
-    private String username;
+    private String        username;
     @NotBlank
     @Size(max = 255)
     @NaturalId
     @Email
-    private String email;
+    private String        email;
     @NotBlank
     @Size(max = 255)
-    private String password;
+    private String        password;
     @NotBlank
     @Size(max = 255)
-    private String name;
+    private String        name;
     @Size(max = 255)
-    private String bio;
+    private String        bio;
     @Size(max = 255)
-    private String imageurl;
+    private String        imageurl;
     @Size(max = 30)
-    private String phonenumber;
-    private int rating;
+    private String        phonenumber;
+    private int           rating;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role>     roles       = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_preferences", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> preferences = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<Offer> offers = new HashSet<>();
+
+    @OneToOne(mappedBy = "user")
+    private Location location;
 
     public User() {
     }
@@ -149,5 +154,29 @@ public class User extends DataAudit{
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public Set<Category> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(Set<Category> preferences) {
+        this.preferences = preferences;
+    }
+
+    public Set<Offer> getOffers() {
+        return offers;
+    }
+
+    public void setOffers(Set<Offer> offers) {
+        this.offers = offers;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

@@ -1,16 +1,19 @@
 package edible.simple.payload.user;
 
-public class CurrentUserResponse{
+import javax.validation.constraints.Email;
+
+public class BaseUserResponse {
     private Long id;
     private String username;
     private String name;
+    @Email
     private String email;
+    private String phonenumber;
     private String imageurl;
     private String bio;
-    private String phonenumber;
     private int rating;
 
-    public CurrentUserResponse() {
+    public BaseUserResponse() {
     }
 
     public Long getId() {

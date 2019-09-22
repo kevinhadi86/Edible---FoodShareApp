@@ -2,7 +2,7 @@
  * Alipay.com Inc.
  * Copyright (c) 2004‐2019 All Rights Reserved.
  */
-package edible.simple.model;
+package edible.simple.model.dataEnum;
 
 /**
  * @author Kevin Hadinata
@@ -10,7 +10,8 @@ package edible.simple.model;
  */
 public enum StatusEnum {
     INIT,
-    ONGOING,
+    ACCEPTED,
     REJECTED,
+    ONGOING,
     DONE;
 }

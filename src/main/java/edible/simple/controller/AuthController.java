@@ -4,30 +4,29 @@
  */
 package edible.simple.controller;
 
+import java.util.Base64;
 import java.util.Date;
 
 import javax.validation.Valid;
 
+import edible.simple.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import edible.simple.model.User;
 import edible.simple.payload.ApiResponse;
 import edible.simple.payload.auth.JwtAuthenticationResponse;
 import edible.simple.payload.auth.LoginRequest;
 import edible.simple.payload.auth.ResetPasswordRequest;
-import edible.simple.payload.auth.SignUpRequest;
+import edible.simple.payload.user.SaveUserRequest;
 import edible.simple.repository.RoleRepository;
 import edible.simple.security.JwtTokenProvider;
-import edible.simple.service.AuthService;
+import edible.simple.service.UserService;
 
 /**
  * @author Kevin Hadinata
@@ -38,47 +37,78 @@ import edible.simple.service.AuthService;
 public class AuthController {
 
     @Autowired
-    AuthenticationManager    authenticationManager;
+    AuthenticationManager authenticationManager;
 
     @Autowired
-    AuthService              authService;
+    UserService           userService;
 
     @Autowired
-    RoleRepository           roleRepository;
+    AuthService           authService;
 
     @Autowired
-    PasswordEncoder          passwordEncoder;
+    RoleRepository        roleRepository;
 
     @Autowired
-    JwtTokenProvider         jwtTokenProvider;
+    PasswordEncoder       passwordEncoder;
 
     @Autowired
-    JavaMailSender           javaMailSender;
+    JwtTokenProvider      jwtTokenProvider;
+
+    @Autowired
+    JavaMailSender        javaMailSender;
 
     @PostMapping("/signin")
     public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         String token = authService.authenticateUser(loginRequest);
-        if(token != null){
+        if (token != null) {
             return ResponseEntity.ok(new JwtAuthenticationResponse(true, token));
         }
-        return new ResponseEntity(new ApiResponse(false,"Username or Email or Password is Wrong"), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(new ApiResponse(false, "Username or Email or Password is Wrong"),
+            HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        return authService.registerUser(signUpRequest);
+    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SaveUserRequest signUpRequest) {
+        return userService.saveNewUser(signUpRequest);
     }
 
-    @PostMapping("/sendResetPasswordMail")
-    public ResponseEntity<ApiResponse> sendResetPasswordMail(@RequestBody ResetPasswordRequest resetPasswordRequest) {
-        User user = authService.getUserByEmail(resetPasswordRequest.getEmail());
+    @PostMapping("/sendConfirmationResetPasswordMail")
+    public ResponseEntity<ApiResponse> sendConfirmationResetPasswordMail(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        User user = userService.getUserByEmail(resetPasswordRequest.getEmail());
+        if (user != null) {
+            Date now = new Date();
+            String nowMiliseconds = Long.toString(now.getTime());
+            String token = Base64.getEncoder()
+                .encodeToString((user.getEmail() + "%%" + nowMiliseconds).getBytes());
+            String url = "http://localhost:9002/api/auth/sendResetPasswordMail/" + token;
+            String message = "Hello, this is from Edible. Please open this link and wait for another email if you want to confirm your password reset for your Edible account, here is the link: "
+                             + url;
+            userService.sendResetPasswordEmail(user.getEmail(), message);
+            return new ResponseEntity(
+                new ApiResponse(true, "Reset password email sent successfully"), HttpStatus.OK);
+        }
+        return new ResponseEntity(new ApiResponse(false, "Email not Exists"),
+            HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/sendResetPasswordMail/{token}")
+    public ResponseEntity<ApiResponse> sendResetPasswordMail(@PathVariable String token) {
+        byte[] decodedToken = Base64.getDecoder().decode(token);
+        String dataToken = new String(decodedToken);
+        String[] data = dataToken.split("%%", 2);
+        String email = data[0];
+        User user = userService.getUserByEmail(email);
         if (user != null) {
             Date now = new Date();
             String newPassword = Long.toString(now.getTime());
             user.setPassword(passwordEncoder.encode(newPassword));
-            authService.saveUser(user);
-            authService.sendResetPasswordEmail(user.getEmail(), newPassword);
-            return new ResponseEntity(new ApiResponse(true,"Reset password email sent successfully"),HttpStatus.OK);
+            userService.saveUser(user);
+
+            String message = "Hello, this is from Edible. This is your new password: "
+                             + newPassword;
+            userService.sendResetPasswordEmail(user.getEmail(), message);
+            return new ResponseEntity(
+                new ApiResponse(true, "Reset password email sent successfully"), HttpStatus.OK);
         }
         return new ResponseEntity(new ApiResponse(false, "Email not Exists"),
             HttpStatus.BAD_REQUEST);

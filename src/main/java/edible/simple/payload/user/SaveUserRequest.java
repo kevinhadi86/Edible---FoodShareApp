@@ -8,26 +8,14 @@ import javax.validation.constraints.NotBlank;
 
 /**
  * @author Kevin Hadinata
- * @version $Id: ChangeProfileRequest.java, v 0.1 2019‐09‐16 13:31 Kevin Hadinata Exp $$
+ * @version $Id: SaveUserRequest.java, v 0.1 2019‐09‐16 13:31 Kevin Hadinata Exp $$
  */
-public class ChangeProfileRequest {
-
-    @NotBlank
-    private long id;
-
-    private String username;
-    private String email;
+public class SaveUserRequest extends BaseUserResponse {
 
     @NotBlank
     private String password;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    private String newPassword;
 
     public String getPassword() {
         return password;
@@ -35,5 +23,13 @@ public class ChangeProfileRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 }

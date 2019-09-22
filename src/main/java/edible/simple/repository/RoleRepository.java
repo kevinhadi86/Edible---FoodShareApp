@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import edible.simple.model.Role;
-import edible.simple.model.RoleName;
+import edible.simple.model.dataEnum.RoleName;
 
 /**
  * @author Kevin Hadinata

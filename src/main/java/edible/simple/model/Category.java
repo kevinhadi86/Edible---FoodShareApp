@@ -6,31 +6,33 @@ package edible.simple.model;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.NaturalId;
 
-import edible.simple.model.dataEnum.RoleName;
+import edible.simple.model.dataEnum.CategoryName;
 
 /**
  * @author Kevin Hadinata
- * @version $Id: Role.java, v 0.1 2019‐09‐11 12:27 Kevin Hadinata Exp $$
+ * @version $Id: Category.java, v 0.1 2019‐09‐17 18:36 Kevin Hadinata Exp $$
  */
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "categories")
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long     id;
+    private Long         id;
 
     @Enumerated(EnumType.STRING)
     @NaturalId
     @Column(length = 60)
-    private RoleName name;
+    private CategoryName name;
 
-    public Role() {
+    public Category() {
     }
 
-    public Role(RoleName name) {
+    public Category(CategoryName name) {
         this.name = name;
     }
 
@@ -42,11 +44,11 @@ public class Role {
         this.id = id;
     }
 
-    public RoleName getName() {
+    public CategoryName getName() {
         return name;
     }
 
-    public void setName(RoleName name) {
+    public void setName(CategoryName name) {
         this.name = name;
     }
 }
