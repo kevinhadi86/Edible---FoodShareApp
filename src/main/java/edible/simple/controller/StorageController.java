@@ -42,7 +42,7 @@ public class StorageController {
     }
 
     @PostMapping("/")
-    public List<String> handleFileUpload(@RequestParam("file") List<MultipartFile> files) {
+    public List<String> handleFileUpload(@RequestParam("files") List<MultipartFile> files) {
 
         List<String> response = new ArrayList<>();
         for (MultipartFile file: files){
