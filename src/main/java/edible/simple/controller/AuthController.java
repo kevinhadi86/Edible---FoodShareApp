@@ -57,6 +57,11 @@ public class AuthController {
     @Autowired
     JavaMailSender        javaMailSender;
 
+    @GetMapping("/HelloWorld")
+    public ResponseEntity<ApiResponse> helloWorld(){
+        return new ResponseEntity(new ApiResponse(true,"Hello World"),HttpStatus.OK);
+    }
+
     @PostMapping("/signin")
     public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         String token = authService.authenticateUser(loginRequest);
