@@ -4,15 +4,18 @@
  */
 package edible.simple.controller;
 
-import edible.simple.exception.StorageFileNotFoundException;
-import edible.simple.service.StorageService;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import edible.simple.exception.StorageFileNotFoundException;
+import edible.simple.service.StorageService;
 
 /**
  * @author Kevin Hadinata
@@ -20,12 +23,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  */
 @RestController
 @RequestMapping("/api/upload")
-public class UploadController {
+public class StorageController {
 
     private final StorageService storageService;
 
     @Autowired
-    public UploadController(StorageService storageService) {
+    public StorageController(StorageService storageService) {
         this.storageService = storageService;
     }
 
@@ -39,14 +42,15 @@ public class UploadController {
     }
 
     @PostMapping("/")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
-                                   RedirectAttributes redirectAttributes) {
+    public List<String> handleFileUpload(@RequestParam("file") List<MultipartFile> files) {
 
-        storageService.store(file);
-        redirectAttributes.addFlashAttribute("message",
-                "You successfully uploaded " + file.getOriginalFilename() + "!");
+        List<String> response = new ArrayList<>();
+        for (MultipartFile file: files){
+            storageService.store(file);
+            response.add(file.getOriginalFilename());
+        }
 
-        return "redirect:/";
+        return response;
     }
 
     @ExceptionHandler(StorageFileNotFoundException.class)
