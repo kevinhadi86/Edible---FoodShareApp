@@ -6,7 +6,6 @@ package edible.simple.payload.offer;
 
 import edible.simple.model.dataEnum.CategoryName;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,7 +19,7 @@ public class MyOfferResponse {
     private String title;
     private String description;
     private Float unit;
-    private Date expiryDate;
+    private String expiryDate;
     private List<String> imageUrls;
 
     public Long getId() {
@@ -63,11 +62,11 @@ public class MyOfferResponse {
         this.unit = unit;
     }
 
-    public Date getExpiryDate() {
+    public String getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(String expiryDate) {
         this.expiryDate = expiryDate;
     }
 

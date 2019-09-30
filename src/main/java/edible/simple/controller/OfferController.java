@@ -57,7 +57,7 @@ public class OfferController {
         offerResponse.setTitle(offer.getTitle());
         offerResponse.setDescription(offer.getDescription());
         offerResponse.setUnit(offer.getUnit());
-        offerResponse.setExpiryDate(offer.getExpirytime());
+        offerResponse.setExpiryDate(new SimpleDateFormat("dd/MM/yyyy").format(offer.getExpirytime()));
         List<String> imageUrls = new ArrayList<>();
         for (OfferImage offerImage : offer.getOfferImages()) {
             imageUrls.add(offerImage.getUrl());
@@ -86,7 +86,7 @@ public class OfferController {
             myOfferResponse.setTitle(offer.getTitle());
             myOfferResponse.setDescription(offer.getDescription());
             myOfferResponse.setUnit(offer.getUnit());
-            myOfferResponse.setExpiryDate(offer.getExpirytime());
+            myOfferResponse.setExpiryDate(new SimpleDateFormat("dd/MM/yyyy").format(offer.getExpirytime()));
             List<String> imageUrls = new ArrayList<>();
             for (OfferImage offerImage : offer.getOfferImages()) {
                 imageUrls.add(offerImage.getUrl());
@@ -98,7 +98,7 @@ public class OfferController {
     }
 
     @GetMapping("category/{category}")
-    public List<OfferResponse> getOfferByUser(@PathVariable String category) {
+    public List<OfferResponse> getOfferByCategory(@PathVariable String category) {
 
         Category searchCategory = categoryService
             .getCategoryByName(CategoryName.valueOf(category.toUpperCase()));
@@ -113,7 +113,7 @@ public class OfferController {
             offerResponse.setTitle(offer.getTitle());
             offerResponse.setDescription(offer.getDescription());
             offerResponse.setUnit(offer.getUnit());
-            offerResponse.setExpiryDate(offer.getExpirytime());
+            offerResponse.setExpiryDate(new SimpleDateFormat("dd/MM/yyyy").format(offer.getExpirytime()));
             List<String> imageUrls = new ArrayList<>();
             for (OfferImage offerImage : offer.getOfferImages()) {
                 imageUrls.add(offerImage.getUrl());
