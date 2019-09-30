@@ -64,6 +64,19 @@ public class UserController {
         return currentUser;
     }
 
+    @PostMapping("/me/update/password")
+    public ResponseEntity<ApiResponse> updateUserPassword(@CurrentUser UserPrincipal userPrincipal, @RequestBody SaveUserRequest saveUserRequest){
+        if (passwordEncoder.matches(saveUserRequest.getPassword(), userPrincipal.getPassword())) {
+            User user = userService.getUserByEmail(userPrincipal.getEmail());
+            user.setPassword(passwordEncoder.encode(saveUserRequest.getNewPassword()));
+            userService.saveUser(user);
+            return new ResponseEntity(new ApiResponse(true, "Update password success"),
+                    HttpStatus.OK);
+        }
+        return new ResponseEntity(new ApiResponse(false, "Password is wrong"),
+                HttpStatus.BAD_REQUEST);
+    }
+
     @PostMapping("/me/update")
     public ResponseEntity<ApiResponse> updateUserProfile(@CurrentUser UserPrincipal userPrincipal,
                                                          @RequestBody SaveUserRequest saveUserRequest) {
@@ -88,7 +101,6 @@ public class UserController {
             user.setPhonenumber(saveUserRequest.getPhonenumber());
             user.setImageurl(saveUserRequest.getImageurl());
             user.setBio(saveUserRequest.getBio());
-            user.setPassword(passwordEncoder.encode(saveUserRequest.getNewPassword()));
 
             userService.saveUser(user);
             return new ResponseEntity(new ApiResponse(true, "Update profile success"),
