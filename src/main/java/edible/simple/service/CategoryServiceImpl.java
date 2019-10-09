@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edible.simple.model.Category;
-import edible.simple.model.User;
 import edible.simple.model.dataEnum.CategoryName;
-import edible.simple.payload.user.SetCategoryRequest;
 import edible.simple.repository.CategoryRepository;
 
 /**
@@ -35,21 +33,5 @@ public class CategoryServiceImpl implements CategoryService {
             return category.get();
         }
         return null;
-    }
-
-    @Override
-    public boolean setCategory(SetCategoryRequest setCategoryRequest) {
-
-        if(setCategoryRequest.getRequestType().equals("USER")){
-            User user = userService.getUserById(setCategoryRequest.getRequestId());
-            user.setPreferences(null);
-            userService.saveUser(user);
-
-            user.setPreferences(setCategoryRequest.getCategories());
-            userService.saveUser(user);
-            return true;
-        }
-
-        return false;
     }
 }

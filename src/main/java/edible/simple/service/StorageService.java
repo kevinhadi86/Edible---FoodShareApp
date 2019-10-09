@@ -4,27 +4,20 @@
  */
 package edible.simple.service;
 
-import org.springframework.core.io.Resource;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.nio.file.Path;
-import java.util.stream.Stream;
+
+import org.springframework.core.io.Resource;
 
 /**
  * @author Kevin Hadinata
- * @version $Id: StorageService.java, v 0.1 2019‐09‐27 17:18 Kevin Hadinata Exp $$
+ * @version $Id: StorageService.java, v 0.1 2019‐10‐03 17:35 Kevin Hadinata Exp $$
  */
 public interface StorageService {
 
-    void init();
-
-    void store(MultipartFile file);
-
-    Stream<Path> loadAll();
+    String store(String file, String baseUrl);
 
     Path load(String filename);
 
     Resource loadAsResource(String filename);
 
-    void deleteAll();
 }

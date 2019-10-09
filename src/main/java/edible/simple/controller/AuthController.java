@@ -9,7 +9,6 @@ import java.util.Date;
 
 import javax.validation.Valid;
 
-import edible.simple.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,10 @@ import edible.simple.payload.ApiResponse;
 import edible.simple.payload.auth.JwtAuthenticationResponse;
 import edible.simple.payload.auth.LoginRequest;
 import edible.simple.payload.auth.ResetPasswordRequest;
-import edible.simple.payload.user.SaveUserRequest;
+import edible.simple.payload.user.SaveNewUserRequest;
 import edible.simple.repository.RoleRepository;
 import edible.simple.security.JwtTokenProvider;
+import edible.simple.service.AuthService;
 import edible.simple.service.UserService;
 
 /**
@@ -73,8 +73,13 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SaveUserRequest signUpRequest) {
-        return userService.saveNewUser(signUpRequest);
+    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SaveNewUserRequest signUpRequest) {
+
+        if(userService.saveNewUser(signUpRequest)){
+            return new ResponseEntity(new ApiResponse(true, "Success Register User"), HttpStatus.OK);
+        }
+
+        return new ResponseEntity(new ApiResponse(false, "Failed Register User"), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/sendConfirmationResetPasswordMail")

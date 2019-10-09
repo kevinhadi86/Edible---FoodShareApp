@@ -4,11 +4,12 @@
  */
 package edible.simple.service;
 
-import edible.simple.model.Transaction;
-import edible.simple.model.User;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import edible.simple.model.Transaction;
+import edible.simple.model.User;
 
 /**
  * @author Kevin Hadinata
@@ -16,6 +17,8 @@ import java.util.List;
  */
 @Service
 public interface TransactionService {
+
+    public List<Transaction> getByOfferUser(User user);
 
     public Transaction getTransactionById(Long id);
 

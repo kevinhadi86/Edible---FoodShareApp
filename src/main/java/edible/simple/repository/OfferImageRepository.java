@@ -4,9 +4,9 @@
  */
 package edible.simple.repository;
 
-import edible.simple.model.Offer;
-import edible.simple.model.OfferImage;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import edible.simple.model.OfferImage;
 
 /**
  * @author Kevin Hadinata

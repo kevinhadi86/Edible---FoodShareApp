@@ -4,14 +4,15 @@
  */
 package edible.simple.service;
 
-import edible.simple.model.Transaction;
-import edible.simple.model.User;
-import edible.simple.repository.TransactionRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import edible.simple.model.Transaction;
+import edible.simple.model.User;
+import edible.simple.repository.TransactionRepository;
 
 /**
  * @author Kevin Hadinata
@@ -23,6 +24,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     TransactionRepository transactionRepository;
 
+    @Override
+    public List<Transaction> getByOfferUser(User user) {
+        return transactionRepository.findAllByOffer_User(user);
+    }
 
     @Override
     public Transaction getTransactionById(Long id) {

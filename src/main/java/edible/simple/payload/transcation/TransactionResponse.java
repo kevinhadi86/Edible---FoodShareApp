@@ -4,11 +4,8 @@
  */
 package edible.simple.payload.transcation;
 
-import edible.simple.model.dataEnum.StatusEnum;
-import edible.simple.payload.offer.OfferResponse;
+import edible.simple.payload.offer.OtherUserOfferResponse;
 import edible.simple.payload.user.BaseUserResponse;
-
-import java.util.Date;
 
 /**
  * @author Kevin Hadinata
@@ -17,11 +14,12 @@ import java.util.Date;
 public class TransactionResponse {
 
     private Long id;
-    private StatusEnum status;
-    private Float unit;
+    private String status;
+    private Float quantity;
+    private String unit;
     private BaseUserResponse user;
-    private OfferResponse offer;
-    private Date takentime;
+    private OtherUserOfferResponse offer;
+    private String pickupTime;
 
     public Long getId() {
         return id;
@@ -31,19 +29,27 @@ public class TransactionResponse {
         this.id = id;
     }
 
-    public StatusEnum getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(StatusEnum status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public Float getUnit() {
+    public Float getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Float quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getUnit() {
         return unit;
     }
 
-    public void setUnit(Float unit) {
+    public void setUnit(String unit) {
         this.unit = unit;
     }
 
@@ -55,19 +61,19 @@ public class TransactionResponse {
         this.user = user;
     }
 
-    public OfferResponse getOffer() {
+    public OtherUserOfferResponse getOffer() {
         return offer;
     }
 
-    public void setOffer(OfferResponse offer) {
+    public void setOffer(OtherUserOfferResponse offer) {
         this.offer = offer;
     }
 
-    public Date getTakentime() {
-        return takentime;
+    public String getPickupTime() {
+        return pickupTime;
     }
 
-    public void setTakentime(Date takentime) {
-        this.takentime = takentime;
+    public void setPickupTime(String pickupTime) {
+        this.pickupTime = pickupTime;
     }
 }

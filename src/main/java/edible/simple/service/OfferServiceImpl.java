@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import edible.simple.model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edible.simple.model.Category;
 import edible.simple.model.Offer;
 import edible.simple.model.OfferImage;
 import edible.simple.model.User;
@@ -55,13 +55,18 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    public List<Offer> getAllOffer() {
+        return offerRepository.getAllByOrderByCreatedAtDesc();
+    }
+
+    @Override
     public List<Offer> getOfferByUser(User user) {
-        return offerRepository.getAllByUser(user);
+        return offerRepository.getAllByUserOrderByCreatedAtDesc(user);
     }
 
     @Override
     public List<Offer> getOfferByCategory(Category category) {
-        return offerRepository.getAllByCategory(category);
+        return offerRepository.getAllByCategoryOrderByCreatedAtDesc(category);
     }
 
     @Override

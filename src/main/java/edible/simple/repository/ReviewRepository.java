@@ -4,13 +4,14 @@
  */
 package edible.simple.repository;
 
-import edible.simple.model.Review;
-import edible.simple.model.Transaction;
-import edible.simple.model.User;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import edible.simple.model.Review;
+import edible.simple.model.Transaction;
+import edible.simple.model.User;
 
 /**
  * @author Kevin Hadinata

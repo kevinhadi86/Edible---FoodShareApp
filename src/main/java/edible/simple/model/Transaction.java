@@ -7,7 +7,6 @@ package edible.simple.model;
 import java.util.Date;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import edible.simple.model.dataEnum.StatusEnum;
@@ -29,11 +28,14 @@ public class Transaction extends DataAudit {
     @ManyToOne
     @JoinColumn(name = "offer_id", nullable = false)
     private Offer offer;
+    @ManyToOne
+    @JoinColumn(name = "unit_id", nullable = false)
+    private Unit unit;
     @NotNull
-    private Float unit;
+    private Float quantity;
     @NotNull
     private StatusEnum status;
-    private Date takentime;
+    private Date pickuptime;
 
     public Long getId() {
         return id;
@@ -59,12 +61,20 @@ public class Transaction extends DataAudit {
         this.offer = offer;
     }
 
-    public Float getUnit() {
+    public Unit getUnit() {
         return unit;
     }
 
-    public void setUnit(Float unit) {
+    public void setUnit(Unit unit) {
         this.unit = unit;
+    }
+
+    public Float getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Float quantity) {
+        this.quantity = quantity;
     }
 
     public StatusEnum getStatus() {
@@ -75,11 +85,11 @@ public class Transaction extends DataAudit {
         this.status = status;
     }
 
-    public Date getTakentime() {
-        return takentime;
+    public Date getPickuptime() {
+        return pickuptime;
     }
 
-    public void setTakentime(Date takentime) {
-        this.takentime = takentime;
+    public void setPickuptime(Date pickuptime) {
+        this.pickuptime = pickuptime;
     }
 }

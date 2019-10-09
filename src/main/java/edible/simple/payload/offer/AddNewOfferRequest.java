@@ -13,12 +13,13 @@ import java.util.List;
  */
 public class AddNewOfferRequest {
 
-    private String category;
-    private String title;
-    private String description;
-    private Float unit;
-    private String expirytime;
-    private List<String> imageurl = new ArrayList<>();
+    private String       category;
+    private String       title;
+    private String       description;
+    private String       unit;
+    private Float        quantity;
+    private String       expiryTime;
+    private List<String> imageUrl = new ArrayList<>();
 
     public String getCategory() {
         return category;
@@ -44,27 +45,35 @@ public class AddNewOfferRequest {
         this.description = description;
     }
 
-    public Float getUnit() {
+    public String getUnit() {
         return unit;
     }
 
-    public void setUnit(Float unit) {
+    public void setUnit(String unit) {
         this.unit = unit;
     }
 
-    public String getExpirytime() {
-        return expirytime;
+    public Float getQuantity() {
+        return quantity;
     }
 
-    public void setExpirytime(String expirytime) {
-        this.expirytime = expirytime;
+    public void setQuantity(Float quantity) {
+        this.quantity = quantity;
     }
 
-    public List<String> getImageurl() {
-        return imageurl;
+    public String getExpiryTime() {
+        return expiryTime;
     }
 
-    public void setImageurl(List<String> imageurl) {
-        this.imageurl = imageurl;
+    public void setExpiryTime(String expiryTime) {
+        this.expiryTime = expiryTime;
+    }
+
+    public List<String> getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(List<String> imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

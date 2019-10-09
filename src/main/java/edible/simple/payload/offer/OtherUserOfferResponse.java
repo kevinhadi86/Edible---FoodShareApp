@@ -4,14 +4,13 @@
  */
 package edible.simple.payload.offer;
 
-import edible.simple.model.User;
 import edible.simple.payload.user.BaseUserResponse;
 
 /**
  * @author Kevin Hadinata
- * @version $Id: OfferResponse.java, v 0.1 2019‐09‐19 18:42 Kevin Hadinata Exp $$
+ * @version $Id: OtherUserOfferResponse.java, v 0.1 2019‐09‐19 18:42 Kevin Hadinata Exp $$
  */
-public class OfferResponse extends MyOfferResponse {
+public class OtherUserOfferResponse extends BaseOfferResponse {
 
     private BaseUserResponse user;
     private String location;

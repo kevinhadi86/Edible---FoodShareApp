@@ -11,7 +11,9 @@ package edible.simple.payload.transcation;
 public class AddTransactionRequest {
 
     private Long offer_id;
-    private Float unit;
+    private String unit;
+    private Float quantity;
+    private String pickupTime;
 
     public Long getOffer_id() {
         return offer_id;
@@ -21,11 +23,27 @@ public class AddTransactionRequest {
         this.offer_id = offer_id;
     }
 
-    public Float getUnit() {
+    public String getUnit() {
         return unit;
     }
 
-    public void setUnit(Float unit) {
+    public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public Float getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Float quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getPickupTime() {
+        return pickupTime;
+    }
+
+    public void setPickupTime(String pickupTime) {
+        this.pickupTime = pickupTime;
     }
 }

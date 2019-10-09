@@ -4,11 +4,20 @@
  */
 package edible.simple.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import edible.simple.model.Review;
 import edible.simple.model.Transaction;
 import edible.simple.model.User;
 import edible.simple.payload.ApiResponse;
-import edible.simple.payload.offer.OfferResponse;
+import edible.simple.payload.offer.OtherUserOfferResponse;
 import edible.simple.payload.review.AddReviewRequest;
 import edible.simple.payload.review.ReviewResponse;
 import edible.simple.payload.transcation.TransactionResponse;
@@ -18,14 +27,6 @@ import edible.simple.security.UserPrincipal;
 import edible.simple.service.ReviewService;
 import edible.simple.service.TransactionService;
 import edible.simple.service.UserService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Kevin Hadinata
@@ -65,12 +66,12 @@ public class ReviewController {
             BeanUtils.copyProperties(review.getTransaction().getUser(),baseUserResponse);
             transactionResponse.setUser(baseUserResponse);
 
-            OfferResponse offerResponse = new OfferResponse();
-            BeanUtils.copyProperties(review.getTransaction().getOffer(),offerResponse);
+            OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
+            BeanUtils.copyProperties(review.getTransaction().getOffer(), otherUserOfferResponse);
             BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
             BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),baseOfferUserResponse);
-            offerResponse.setUser(baseOfferUserResponse);
-            transactionResponse.setOffer(offerResponse);
+            otherUserOfferResponse.setUser(baseOfferUserResponse);
+            transactionResponse.setOffer(otherUserOfferResponse);
 
             reviewResponse.setTransaction(transactionResponse);
 
@@ -99,12 +100,12 @@ public class ReviewController {
             BeanUtils.copyProperties(review.getTransaction().getUser(),baseUserResponse);
             transactionResponse.setUser(baseUserResponse);
 
-            OfferResponse offerResponse = new OfferResponse();
-            BeanUtils.copyProperties(review.getTransaction().getOffer(),offerResponse);
+            OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
+            BeanUtils.copyProperties(review.getTransaction().getOffer(), otherUserOfferResponse);
             BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
             BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),baseOfferUserResponse);
-            offerResponse.setUser(baseOfferUserResponse);
-            transactionResponse.setOffer(offerResponse);
+            otherUserOfferResponse.setUser(baseOfferUserResponse);
+            transactionResponse.setOffer(otherUserOfferResponse);
 
             reviewResponse.setTransaction(transactionResponse);
 
@@ -119,13 +120,36 @@ public class ReviewController {
 
         Transaction transaction = transactionService
             .getTransactionById(addReviewRequest.getTransactionId());
-        if (transaction != null && transaction.getUser().getId() == userPrincipal.getId()) {
+
+        User user = userService.getUserById(userPrincipal.getId());
+
+        Review currentReview = reviewService.getReviewByTransaction(transaction);
+        if(currentReview.equals(null)){
+            return new ResponseEntity(new ApiResponse(false, "Review already done before"), HttpStatus.BAD_REQUEST);
+        }
+
+        if (transaction != null && transaction.getUser() == user) {
             Review review = new Review();
             review.setRating(addReviewRequest.getRating());
             review.setReview(addReviewRequest.getReview());
             review.setTransaction(transaction);
 
             if (reviewService.addReview(review) != null) {
+
+                int rating = 0;
+                int count = 0;
+
+                List<Review> reviews = reviewService.getReviewByUser(user);
+
+                for (Review allReview : reviews){
+                    rating += allReview.getRating();
+                    count ++;
+                }
+
+                user.setRating(rating/count);
+
+                userService.saveUser(user);
+
                 return new ResponseEntity<>(new ApiResponse(true, "Success add review"),
                     HttpStatus.OK);
             }

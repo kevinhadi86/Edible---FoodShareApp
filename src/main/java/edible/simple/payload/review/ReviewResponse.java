@@ -5,7 +5,6 @@
 package edible.simple.payload.review;
 
 import edible.simple.payload.transcation.TransactionResponse;
-import edible.simple.payload.user.BaseUserResponse;
 
 /**
  * @author Kevin Hadinata

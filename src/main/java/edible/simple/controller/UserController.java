@@ -4,12 +4,8 @@
  */
 package edible.simple.controller;
 
-import java.util.HashSet;
-import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 
-import edible.simple.model.Location;
-import edible.simple.payload.user.*;
-import edible.simple.service.LocationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,13 +14,18 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import edible.simple.model.Category;
+import edible.simple.model.Location;
 import edible.simple.model.User;
-import edible.simple.model.dataEnum.CategoryName;
 import edible.simple.payload.ApiResponse;
+import edible.simple.payload.user.BaseUserResponse;
+import edible.simple.payload.user.UpdatePasswordUser;
+import edible.simple.payload.user.UpdateUserRequest;
+import edible.simple.payload.user.UserLocationRequest;
 import edible.simple.security.CurrentUser;
 import edible.simple.security.UserPrincipal;
 import edible.simple.service.CategoryService;
+import edible.simple.service.LocationService;
+import edible.simple.service.StorageService;
 import edible.simple.service.UserService;
 
 /**
@@ -47,101 +48,115 @@ public class UserController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    StorageService storageService;
+
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public BaseUserResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
+
         User user = userService.getUserByEmail(userPrincipal.getEmail());
+
         BaseUserResponse currentUser = new BaseUserResponse();
         BeanUtils.copyProperties(user, currentUser);
+
         return currentUser;
     }
 
     @GetMapping("/other/{username}")
-    public BaseUserResponse getOtherUser(@PathVariable String username){
+    public BaseUserResponse getOtherUser(@PathVariable String username) {
+
         User user = userService.getUserByUsername(username);
+
         BaseUserResponse currentUser = new BaseUserResponse();
         BeanUtils.copyProperties(user, currentUser);
+
         return currentUser;
     }
 
     @PostMapping("/me/update/password")
-    public ResponseEntity<ApiResponse> updateUserPassword(@CurrentUser UserPrincipal userPrincipal, @RequestBody SaveUserRequest saveUserRequest){
-        if (passwordEncoder.matches(saveUserRequest.getPassword(), userPrincipal.getPassword())) {
+    public ResponseEntity<ApiResponse> updateUserPassword(@CurrentUser UserPrincipal userPrincipal,
+                                                          @RequestBody UpdatePasswordUser updatePasswordUser) {
+
+        if (passwordEncoder.matches(updatePasswordUser.getPassword(),
+            userPrincipal.getPassword())) {
+
             User user = userService.getUserByEmail(userPrincipal.getEmail());
-            user.setPassword(passwordEncoder.encode(saveUserRequest.getNewPassword()));
+            user.setPassword(passwordEncoder.encode(updatePasswordUser.getNewPassword()));
+
             userService.saveUser(user);
+
             return new ResponseEntity(new ApiResponse(true, "Update password success"),
-                    HttpStatus.OK);
-        }
-        return new ResponseEntity(new ApiResponse(false, "Password is wrong"),
-                HttpStatus.BAD_REQUEST);
-    }
-
-    @PostMapping("/me/update")
-    public ResponseEntity<ApiResponse> updateUserProfile(@CurrentUser UserPrincipal userPrincipal,
-                                                         @RequestBody SaveUserRequest saveUserRequest) {
-        if (passwordEncoder.matches(saveUserRequest.getPassword(), userPrincipal.getPassword())) {
-            User user = userService.getUserByEmail(userPrincipal.getEmail());
-            if (!user.getEmail().equals(saveUserRequest.getEmail())
-                && userService.existsByEmail(saveUserRequest.getEmail())) {
-                return new ResponseEntity(new ApiResponse(false, "Email already exists"),
-                    HttpStatus.BAD_REQUEST);
-            } else {
-                user.setEmail(saveUserRequest.getEmail());
-            }
-            if (!user.getUsername().equals(saveUserRequest.getUsername())
-                && userService.existsByUsername(saveUserRequest.getUsername())) {
-                return new ResponseEntity(new ApiResponse(false, "Username already exists"),
-                    HttpStatus.BAD_REQUEST);
-            } else {
-                user.setUsername(saveUserRequest.getUsername());
-            }
-
-            user.setName(saveUserRequest.getName());
-            user.setPhonenumber(saveUserRequest.getPhonenumber());
-            user.setImageurl(saveUserRequest.getImageurl());
-            user.setBio(saveUserRequest.getBio());
-
-            userService.saveUser(user);
-            return new ResponseEntity(new ApiResponse(true, "Update profile success"),
                 HttpStatus.OK);
         }
+
         return new ResponseEntity(new ApiResponse(false, "Password is wrong"),
             HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/me/preferences")
-    public ResponseEntity<ApiResponse> setUserPreferences(@CurrentUser UserPrincipal userPrincipal, @RequestBody UserPreferencesRequest userPreferencesRequest){
+    @PostMapping("/me/update")
+    public ResponseEntity<ApiResponse> updateUserProfile(@CurrentUser UserPrincipal userPrincipal,
+                                                         @RequestBody UpdateUserRequest updateUserRequest, HttpServletRequest request) {
 
-        Set<Category> preferences = new HashSet<>();
+        User user = userService.getUserByEmail(userPrincipal.getEmail());
 
-        for (String category : userPreferencesRequest.getCategories()){
-            CategoryName categoryName = CategoryName.valueOf(category);
-            if(categoryName == null){
-                return new ResponseEntity(new ApiResponse(false,"Failed update user preferences, category not available: "+category), HttpStatus.BAD_REQUEST);
+        if ((!user.getUsername().equals(updateUserRequest.getUsername())
+             && userService.existsByUsername(updateUserRequest.getUsername()))
+            || (!user.getEmail().equals(updateUserRequest.getEmail())
+                && userService.existsByEmail(updateUserRequest.getEmail()))) {
+
+            return new ResponseEntity(new ApiResponse(false, "Email or username already exists"),
+                HttpStatus.BAD_REQUEST);
+        }
+
+        if (updateUserRequest.getId().equals(userPrincipal.getId())) {
+
+            user.setEmail(updateUserRequest.getEmail());
+            user.setUsername(updateUserRequest.getUsername());
+            user.setName(updateUserRequest.getName());
+            user.setPhonenumber(updateUserRequest.getPhoneNumber());
+
+            String baseUrl = String.format("%s://%s:%d/api/image/files/",request.getScheme(),  request.getServerName(), request.getServerPort());
+            String imageUrl = storageService.store(updateUserRequest.getImageUrl(),baseUrl);
+
+            user.setImageurl(imageUrl);
+
+            user.setBio(updateUserRequest.getBio());
+
+            if(userService.saveUser(user)){
+
+                return new ResponseEntity(new ApiResponse(true, "Update profile success"),
+                        HttpStatus.OK);
             }
-            preferences.add(categoryService.getCategoryByName(categoryName));
+            return new ResponseEntity(new ApiResponse(false, "failed update user"),
+                    HttpStatus.BAD_REQUEST);
         }
-        SetCategoryRequest setCategoryRequest = new SetCategoryRequest(userPrincipal.getId(),preferences,"USER");
-        if(categoryService.setCategory(setCategoryRequest)){
-            return new ResponseEntity(new ApiResponse(true,"Success update user preferences"), HttpStatus.OK);
-        }
-        return new ResponseEntity(new ApiResponse(false,"Failed update user preferences"), HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity(new ApiResponse(false, "failed update user because id is different"),
+            HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/me/location")
-    public ResponseEntity<ApiResponse> setUserLocation(@CurrentUser UserPrincipal userPrincipal, @RequestBody UserLocationRequest userLocationRequest){
+    public ResponseEntity<ApiResponse> setUserLocation(@CurrentUser UserPrincipal userPrincipal,
+                                                       @RequestBody UserLocationRequest userLocationRequest) {
+
         User user = userService.getUserById(userPrincipal.getId());
+
         Location location = locationService.getLocationByUser(user);
-        if(location == null){
-            location = new Location(user,userLocationRequest.getName());
-        }else{
+
+        if (location == null) {
+            location = new Location(user, userLocationRequest.getName());
+        } else {
             location.setName(userLocationRequest.getName());
         }
-        if(locationService.saveLocation(location)){
-            return new ResponseEntity(new ApiResponse(true, "Success set user location"), HttpStatus.OK);
+
+        if (locationService.saveLocation(location)) {
+            return new ResponseEntity(new ApiResponse(true, "Success set user location"),
+                HttpStatus.OK);
         }
-        return new ResponseEntity(new ApiResponse(false, "Failed set user location"), HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity(new ApiResponse(false, "Failed set user location"),
+            HttpStatus.BAD_REQUEST);
     }
 
 }

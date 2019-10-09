@@ -4,12 +4,23 @@
  */
 package edible.simple.controller;
 
-import edible.simple.model.Offer;
-import edible.simple.model.Transaction;
-import edible.simple.model.User;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import edible.simple.model.*;
 import edible.simple.model.dataEnum.StatusEnum;
+import edible.simple.model.dataEnum.UnitName;
 import edible.simple.payload.ApiResponse;
-import edible.simple.payload.offer.OfferResponse;
+import edible.simple.payload.offer.OtherUserOfferResponse;
 import edible.simple.payload.transcation.AddTransactionRequest;
 import edible.simple.payload.transcation.TransactionResponse;
 import edible.simple.payload.transcation.UpdateTransactionStatusRequest;
@@ -18,16 +29,8 @@ import edible.simple.security.CurrentUser;
 import edible.simple.security.UserPrincipal;
 import edible.simple.service.OfferService;
 import edible.simple.service.TransactionService;
+import edible.simple.service.UnitService;
 import edible.simple.service.UserService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Kevin Hadinata
@@ -46,43 +49,135 @@ public class TransactionController {
     @Autowired
     OfferService       offerService;
 
-    @GetMapping("/myTransaction")
-    public List<TransactionResponse> getMyTransaction(@CurrentUser UserPrincipal userPrincipal) {
+    @Autowired
+    UnitService        unitService;
+
+    @GetMapping("/myTransaction/take")
+    public List<TransactionResponse> getMyTransactionAsTaker(@CurrentUser UserPrincipal userPrincipal) {
+
         User user = userService.getUserById(userPrincipal.getId());
+
         List<Transaction> transactions = transactionService.getTransactionByUser(user);
         List<TransactionResponse> myTransaction = new ArrayList<>();
+
         for (Transaction transaction : transactions) {
+
             TransactionResponse transactionResponse = new TransactionResponse();
+
             transactionResponse.setId(transaction.getId());
-            transactionResponse.setStatus(transaction.getStatus());
-            transactionResponse.setUnit(transaction.getUnit());
-            transactionResponse.setTakentime(transaction.getTakentime());
+            transactionResponse.setStatus(transaction.getStatus().name());
+            transactionResponse.setUnit(transaction.getUnit().getName().name());
+            transactionResponse.setQuantity(transaction.getQuantity());
+            transactionResponse
+                .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickuptime()));
 
             BaseUserResponse userResponse = new BaseUserResponse();
             BeanUtils.copyProperties(transaction.getUser(), userResponse);
 
             transactionResponse.setUser(userResponse);
 
-            OfferResponse offerResponse = new OfferResponse();
-            fillOfferResponse(offerResponse, transaction);
+            OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
+            fillOfferResponse(otherUserOfferResponse, transaction);
 
-            transactionResponse.setOffer(offerResponse);
+            transactionResponse.setOffer(otherUserOfferResponse);
 
             myTransaction.add(transactionResponse);
         }
         return myTransaction;
     }
 
+    @GetMapping("/myTransaction")
+    public List<TransactionResponse> getMyTransaction(@CurrentUser UserPrincipal userPrincipal) {
+
+        User user = userService.getUserById(userPrincipal.getId());
+
+        List<Transaction> transactions = transactionService.getByOfferUser(user);
+        List<TransactionResponse> myTransaction = new ArrayList<>();
+
+        for (Transaction transaction : transactions) {
+
+            if(transaction.getOffer().getUser().equals(user)) {
+                TransactionResponse transactionResponse = new TransactionResponse();
+
+                transactionResponse.setId(transaction.getId());
+                transactionResponse.setStatus(transaction.getStatus().name());
+                transactionResponse.setUnit(transaction.getUnit().getName().name());
+                transactionResponse.setQuantity(transaction.getQuantity());
+                transactionResponse
+                        .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickuptime()));
+
+                BaseUserResponse userResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(transaction.getUser(), userResponse);
+
+                transactionResponse.setUser(userResponse);
+
+                OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
+                fillOfferResponse(otherUserOfferResponse, transaction);
+
+                transactionResponse.setOffer(otherUserOfferResponse);
+
+                myTransaction.add(transactionResponse);
+            }
+        }
+        return myTransaction;
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<ApiResponse> addTransaction(@CurrentUser UserPrincipal userPrincipal,
+                                                      @RequestBody AddTransactionRequest request) {
+        Offer offer = offerService.getOfferById(request.getOffer_id());
+        if (userPrincipal.getId() != offer.getUser().getId() && offer != null
+            && checkTakeTransaction(request, offer)) {
+
+            Transaction transaction = new Transaction();
+            transaction.setUser(userService.getUserById(userPrincipal.getId()));
+            transaction.setOffer(offer);
+            transaction.setQuantity(request.getQuantity());
+
+            UnitName unitName = UnitName.valueOf(request.getUnit());
+            if (unitName == null) {
+                return new ResponseEntity(new ApiResponse(false, "unit not valid"),
+                    HttpStatus.BAD_REQUEST);
+            }
+            Unit unit = unitService.getUnitByName(unitName);
+            transaction.setUnit(unit);
+
+            transaction.setStatus(StatusEnum.INIT);
+
+            Date pickupTime = new Date();
+            try {
+                pickupTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(request.getPickupTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            transaction.setPickuptime(pickupTime);
+
+            if (transactionService.saveTransaction(transaction) != null) {
+                return new ResponseEntity(new ApiResponse(true, "Success add transaction"),
+                    HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity(new ApiResponse(false, "Failed add transaction"),
+            HttpStatus.BAD_REQUEST);
+    }
+
     @PostMapping("/accepted")
     public ResponseEntity<ApiResponse> updateTransactionToAccepted(@CurrentUser UserPrincipal userPrincipal,
                                                                    @RequestBody UpdateTransactionStatusRequest request) {
         Transaction transaction = transactionService.getTransactionById(request.getId());
-        if (transaction != null && transaction.getStatus()!= StatusEnum.DONE  && transaction.getOffer().getUser().getId() == userPrincipal.getId()) {
+        if (transaction != null && transaction.getStatus() != StatusEnum.DONE
+            && transaction.getOffer().getUser().getId() == userPrincipal.getId()
+            && transaction.getStatus() != StatusEnum.REJECTED) {
+
             transaction.setStatus(StatusEnum.ACCEPTED);
+
             if (transactionService.saveTransaction(transaction) != null) {
+
                 Offer offer = offerService.getOfferById(transaction.getOffer().getId());
-                offer.setUnit(offer.getUnit() - transaction.getUnit());
+                offer.setQuantity(offer.getQuantity() - transaction.getQuantity());
+
                 if (offerService.saveOffer(offer) != null) {
+
                     return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
                         HttpStatus.OK);
                 }
@@ -96,8 +191,11 @@ public class TransactionController {
     public ResponseEntity<ApiResponse> updateTransactionToRejected(@CurrentUser UserPrincipal userPrincipal,
                                                                    @RequestBody UpdateTransactionStatusRequest request) {
         Transaction transaction = transactionService.getTransactionById(request.getId());
-        if (transaction != null&& transaction.getStatus()!= StatusEnum.DONE  && transaction.getOffer().getUser().getId() == userPrincipal.getId()) {
+        if (transaction != null && transaction.getStatus() != StatusEnum.DONE
+            && transaction.getOffer().getUser().getId() == userPrincipal.getId()) {
+
             transaction.setStatus(StatusEnum.REJECTED);
+
             if (transactionService.saveTransaction(transaction) != null) {
                 return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
                     HttpStatus.OK);
@@ -111,9 +209,13 @@ public class TransactionController {
     public ResponseEntity<ApiResponse> updateTranscationToDone(@CurrentUser UserPrincipal userPrincipal,
                                                                @RequestBody UpdateTransactionStatusRequest request) {
         Transaction transaction = transactionService.getTransactionById(request.getId());
-        if (transaction != null && transaction.getStatus()!= StatusEnum.DONE && transaction.getStatus()== StatusEnum.ACCEPTED && transaction.getOffer().getUser().getId() != userPrincipal.getId()) {
+        if (transaction != null && transaction.getStatus() != StatusEnum.DONE
+            && transaction.getStatus() == StatusEnum.ACCEPTED
+            && transaction.getOffer().getUser().getId() != userPrincipal.getId()) {
+
             transaction.setStatus(StatusEnum.DONE);
-            transaction.setTakentime(new Date());
+            transaction.setPickuptime(new Date());
+
             if (transactionService.saveTransaction(transaction) != null) {
                 return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
                     HttpStatus.OK);
@@ -127,8 +229,11 @@ public class TransactionController {
     public ResponseEntity<ApiResponse> updateTranscationToOngoing(@CurrentUser UserPrincipal userPrincipal,
                                                                   @RequestBody UpdateTransactionStatusRequest request) {
         Transaction transaction = transactionService.getTransactionById(request.getId());
-        if (transaction != null && transaction.getStatus()!= StatusEnum.DONE && transaction.getOffer().getUser().getId() == userPrincipal.getId()) {
+        if (transaction != null && transaction.getStatus() != StatusEnum.DONE
+            && transaction.getOffer().getUser().getId() == userPrincipal.getId()) {
+
             transaction.setStatus(StatusEnum.ONGOING);
+
             if (transactionService.saveTransaction(transaction) != null) {
                 return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
                     HttpStatus.OK);
@@ -138,34 +243,35 @@ public class TransactionController {
             HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addTransaction(@CurrentUser UserPrincipal userPrincipal,
-                                                      @RequestBody AddTransactionRequest request) {
-        Offer offer = offerService.getOfferById(request.getOffer_id());
-        if (userPrincipal.getId() != offer.getUser().getId() && offer != null
-            && request.getUnit() != 0 && offer.getUnit() - request.getUnit() > 0) {
-            Transaction transaction = new Transaction();
-            transaction.setUser(userService.getUserById(userPrincipal.getId()));
-            transaction.setOffer(offer);
-            transaction.setUnit(request.getUnit());
-            transaction.setStatus(StatusEnum.INIT);
-            if (transactionService.saveTransaction(transaction) != null) {
-                return new ResponseEntity(new ApiResponse(true, "Success add transaction"),
-                    HttpStatus.OK);
-            }
-        }
-        return new ResponseEntity(new ApiResponse(false, "Failed add transaction"),
-            HttpStatus.BAD_REQUEST);
-    }
+    private void fillOfferResponse(OtherUserOfferResponse otherUserOfferResponse,
+                                   Transaction transaction) {
 
-    private void fillOfferResponse(OfferResponse offerResponse, Transaction transaction) {
-        BeanUtils.copyProperties(transaction.getOffer(), offerResponse);
+        BeanUtils.copyProperties(transaction.getOffer(), otherUserOfferResponse);
+        otherUserOfferResponse.setUnit(transaction.getUnit().getName().name());
+        otherUserOfferResponse.setExpiryDate(
+            new SimpleDateFormat("yyyy-MM-dd").format(transaction.getOffer().getExpirytime()));
+
+        List<String> imageUrls = new ArrayList<>();
+        for (OfferImage offerImage : transaction.getOffer().getOfferImages()) {
+            imageUrls.add(offerImage.getUrl());
+        }
+        otherUserOfferResponse.setImageUrls(imageUrls);
 
         BaseUserResponse baseUserResponse = new BaseUserResponse();
         BeanUtils.copyProperties(transaction.getOffer().getUser(), baseUserResponse);
-        offerResponse.setUser(baseUserResponse);
+        otherUserOfferResponse.setUser(baseUserResponse);
 
-        offerResponse.setLocation(transaction.getOffer().getUser().getLocation().getName());
+        otherUserOfferResponse
+            .setLocation(transaction.getOffer().getUser().getLocation().getName());
+    }
+
+    private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
+        Date now = new Date();
+        if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() > 0
+            && offer.getExpirytime().compareTo(now) < 0) {
+            return true;
+        }
+        return false;
     }
 
 }

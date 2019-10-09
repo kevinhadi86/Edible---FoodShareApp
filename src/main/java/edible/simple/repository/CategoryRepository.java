@@ -7,10 +7,10 @@ package edible.simple.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import edible.simple.model.Category;
 import edible.simple.model.dataEnum.CategoryName;
-import org.springframework.stereotype.Repository;
 
 /**
  * @author Kevin Hadinata

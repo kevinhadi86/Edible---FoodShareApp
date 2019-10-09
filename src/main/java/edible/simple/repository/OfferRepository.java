@@ -4,13 +4,14 @@
  */
 package edible.simple.repository;
 
-import edible.simple.model.Category;
-import edible.simple.model.Offer;
-import edible.simple.model.User;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import edible.simple.model.Category;
+import edible.simple.model.Offer;
+import edible.simple.model.User;
 
 /**
  * @author Kevin Hadinata
@@ -19,7 +20,10 @@ import java.util.List;
 @Repository
 public interface OfferRepository extends JpaRepository<Offer,Long> {
 
-    public List<Offer> getAllByUser(User user);
+    public List<Offer> getAllByOrderByCreatedAtDesc();
 
-    public List<Offer> getAllByCategory(Category category);
+    public List<Offer> getAllByCategoryOrderByCreatedAtDesc(Category category);
+
+    public List<Offer> getAllByUserOrderByCreatedAtDesc(User user);
+
 }

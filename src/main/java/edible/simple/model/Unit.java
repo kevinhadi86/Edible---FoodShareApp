@@ -8,31 +8,24 @@ import javax.persistence.*;
 
 import org.hibernate.annotations.NaturalId;
 
-import edible.simple.model.dataEnum.CategoryName;
+import edible.simple.model.dataEnum.UnitName;
 
 /**
  * @author Kevin Hadinata
- * @version $Id: Category.java, v 0.1 2019‐09‐17 18:36 Kevin Hadinata Exp $$
+ * @version $Id: Unit.java, v 0.1 2019‐10‐02 18:45 Kevin Hadinata Exp $$
  */
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "units")
+public class Unit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long         id;
+    private Long     id;
 
     @Enumerated(EnumType.STRING)
     @NaturalId
     @Column(length = 60)
-    private CategoryName name;
-
-    public Category() {
-    }
-
-    public Category(CategoryName name) {
-        this.name = name;
-    }
+    private UnitName name;
 
     public Long getId() {
         return id;
@@ -42,11 +35,11 @@ public class Category {
         this.id = id;
     }
 
-    public CategoryName getName() {
+    public UnitName getName() {
         return name;
     }
 
-    public void setName(CategoryName name) {
+    public void setName(UnitName name) {
         this.name = name;
     }
 }

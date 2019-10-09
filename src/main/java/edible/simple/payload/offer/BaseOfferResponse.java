@@ -4,22 +4,21 @@
  */
 package edible.simple.payload.offer;
 
-import edible.simple.model.dataEnum.CategoryName;
-
 import java.util.List;
 
 /**
  * @author Kevin Hadinata
- * @version $Id: MyOfferResponse.java, v 0.1 2019‐09‐19 18:26 Kevin Hadinata Exp $$
+ * @version $Id: BaseOfferResponse.java, v 0.1 2019‐09‐19 18:26 Kevin Hadinata Exp $$
  */
-public class MyOfferResponse {
+public class BaseOfferResponse {
 
-    private Long id;
-    private CategoryName categoryName;
-    private String title;
-    private String description;
-    private Float unit;
-    private String expiryDate;
+    private Long         id;
+    private String       categoryName;
+    private String       title;
+    private String       description;
+    private Float        quantity;
+    private String       unit;
+    private String       expiryDate;
     private List<String> imageUrls;
 
     public Long getId() {
@@ -30,11 +29,11 @@ public class MyOfferResponse {
         this.id = id;
     }
 
-    public CategoryName getCategoryName() {
+    public String getCategoryName() {
         return categoryName;
     }
 
-    public void setCategoryName(CategoryName categoryName) {
+    public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
 
@@ -54,11 +53,19 @@ public class MyOfferResponse {
         this.description = description;
     }
 
-    public Float getUnit() {
+    public Float getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Float quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getUnit() {
         return unit;
     }
 
-    public void setUnit(Float unit) {
+    public void setUnit(String unit) {
         this.unit = unit;
     }
 

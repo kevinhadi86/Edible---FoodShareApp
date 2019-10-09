@@ -4,12 +4,13 @@ import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 
-import edible.simple.storage.StorageProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+
+import edible.simple.storage.StorageProperties;
 
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)

@@ -4,12 +4,13 @@
  */
 package edible.simple.repository;
 
-import edible.simple.model.Transaction;
-import edible.simple.model.User;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import edible.simple.model.Transaction;
+import edible.simple.model.User;
 
 /**
  * @author Kevin Hadinata
@@ -17,6 +18,8 @@ import java.util.List;
  */
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction,Long> {
+
+    List<Transaction> findAllByOffer_User(User user);
 
     List<Transaction> findAllByUser(User user);
 }

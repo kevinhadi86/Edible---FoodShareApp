@@ -4,14 +4,15 @@
  */
 package edible.simple.service;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import edible.simple.model.Review;
 import edible.simple.model.Transaction;
 import edible.simple.model.User;
 import edible.simple.repository.ReviewRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author Kevin Hadinata

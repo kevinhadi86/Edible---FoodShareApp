@@ -27,10 +27,13 @@ public class Offer extends DataAudit {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+    @ManyToOne
+    @JoinColumn(name = "unit_id", nullable = false)
+    private Unit unit;
 
     private String title;
     private String description;
-    private Float unit;
+    private Float quantity;
     private Date expirytime;
 
     @OneToMany(mappedBy = "offer")
@@ -79,11 +82,19 @@ public class Offer extends DataAudit {
         this.description = description;
     }
 
-    public Float getUnit() {
+    public Float getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Float quantity) {
+        this.quantity = quantity;
+    }
+
+    public Unit getUnit() {
         return unit;
     }
 
-    public void setUnit(Float unit) {
+    public void setUnit(Unit unit) {
         this.unit = unit;
     }
 

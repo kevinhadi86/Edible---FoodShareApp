@@ -24,6 +24,8 @@ public interface OfferService {
 
     public Offer getOfferById(Long id);
 
+    public List<Offer> getAllOffer();
+
     public List<Offer> getOfferByUser(User user);
 
     public List<Offer> getOfferByCategory(Category category);

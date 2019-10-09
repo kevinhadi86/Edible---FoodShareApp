@@ -4,11 +4,8 @@
  */
 package edible.simple.service;
 
-import org.springframework.http.ResponseEntity;
-
 import edible.simple.model.User;
-import edible.simple.payload.ApiResponse;
-import edible.simple.payload.user.SaveUserRequest;
+import edible.simple.payload.user.SaveNewUserRequest;
 
 /**
  * @author Kevin Hadinata
@@ -16,7 +13,7 @@ import edible.simple.payload.user.SaveUserRequest;
  */
 public interface UserService {
 
-    public ResponseEntity<ApiResponse> saveNewUser(SaveUserRequest signUpRequest);
+    public boolean saveNewUser(SaveNewUserRequest saveNewUserRequest);
 
     public void sendResetPasswordEmail(String email, String text);
 

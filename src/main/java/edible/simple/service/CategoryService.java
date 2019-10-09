@@ -6,7 +6,6 @@ package edible.simple.service;
 
 import edible.simple.model.Category;
 import edible.simple.model.dataEnum.CategoryName;
-import edible.simple.payload.user.SetCategoryRequest;
 
 /**
  * @author Kevin Hadinata
@@ -15,7 +14,5 @@ import edible.simple.payload.user.SetCategoryRequest;
 public interface CategoryService {
 
     public Category getCategoryByName(CategoryName name);
-
-    public boolean setCategory(SetCategoryRequest setCategoryRequest);
 
 }

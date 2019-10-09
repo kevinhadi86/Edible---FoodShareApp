@@ -12,9 +12,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.NaturalId;
 
 /**
@@ -45,19 +42,14 @@ public class User extends DataAudit {
     private String        name;
     @Size(max = 255)
     private String        bio;
-    @Size(max = 255)
-    private String        imageurl;
     @Size(max = 30)
     private String        phonenumber;
+    private String        imageurl;
     private int           rating;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role>     roles       = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_preferences", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> preferences = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<Offer> offers = new HashSet<>();
@@ -154,14 +146,6 @@ public class User extends DataAudit {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    public Set<Category> getPreferences() {
-        return preferences;
-    }
-
-    public void setPreferences(Set<Category> preferences) {
-        this.preferences = preferences;
     }
 
     public Set<Offer> getOffers() {
