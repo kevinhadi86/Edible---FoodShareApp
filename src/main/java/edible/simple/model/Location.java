@@ -21,7 +21,6 @@ public class Location {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @NotBlank
     private String name;
     private String longitude;
     private String latitude;
