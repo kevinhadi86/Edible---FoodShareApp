@@ -221,7 +221,7 @@ public class OfferController {
         baseOfferResponse.setTitle(offer.getTitle());
         baseOfferResponse.setDescription(offer.getDescription());
         baseOfferResponse.setQuantity(offer.getQuantity());
-        baseOfferResponse.setUnit(offer.getUnit().getName().name());
+        baseOfferResponse.setUnit(offer.getUnit().getUnitname().name());
         baseOfferResponse
             .setExpiryDate(new SimpleDateFormat("yyyy-MM-dd").format(offer.getExpirytime()));
         List<String> imageUrls = new ArrayList<>();
@@ -241,7 +241,7 @@ public class OfferController {
         BeanUtils.copyProperties(offer.getUser(), baseUserResponse);
         otherUserOfferResponse.setUser(baseUserResponse);
 
-        otherUserOfferResponse.setLocation(offer.getUser().getLocation().getName());
+        otherUserOfferResponse.setLocation(offer.getUser().getLocation().getLocationname());
     }
 
     private void fillOfferRequest(Offer offer, AddNewOfferRequest addNewOfferRequest) {

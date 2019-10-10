@@ -147,7 +147,7 @@ public class UserController {
         if (location == null) {
             location = new Location(user, userLocationRequest.getName());
         } else {
-            location.setName(userLocationRequest.getName());
+            location.setLocationname(userLocationRequest.getName());
         }
 
         if (locationService.saveLocation(location)) {

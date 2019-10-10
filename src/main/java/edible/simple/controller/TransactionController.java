@@ -66,7 +66,7 @@ public class TransactionController {
 
             transactionResponse.setId(transaction.getId());
             transactionResponse.setStatus(transaction.getStatus().name());
-            transactionResponse.setUnit(transaction.getUnit().getName().name());
+            transactionResponse.setUnit(transaction.getUnit().getUnitname().name());
             transactionResponse.setQuantity(transaction.getQuantity());
             transactionResponse
                 .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickuptime()));
@@ -101,7 +101,7 @@ public class TransactionController {
 
                 transactionResponse.setId(transaction.getId());
                 transactionResponse.setStatus(transaction.getStatus().name());
-                transactionResponse.setUnit(transaction.getUnit().getName().name());
+                transactionResponse.setUnit(transaction.getUnit().getUnitname().name());
                 transactionResponse.setQuantity(transaction.getQuantity());
                 transactionResponse
                         .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickuptime()));
@@ -247,7 +247,7 @@ public class TransactionController {
                                    Transaction transaction) {
 
         BeanUtils.copyProperties(transaction.getOffer(), otherUserOfferResponse);
-        otherUserOfferResponse.setUnit(transaction.getUnit().getName().name());
+        otherUserOfferResponse.setUnit(transaction.getUnit().getUnitname().name());
         otherUserOfferResponse.setExpiryDate(
             new SimpleDateFormat("yyyy-MM-dd").format(transaction.getOffer().getExpirytime()));
 
@@ -262,7 +262,7 @@ public class TransactionController {
         otherUserOfferResponse.setUser(baseUserResponse);
 
         otherUserOfferResponse
-            .setLocation(transaction.getOffer().getUser().getLocation().getName());
+            .setLocation(transaction.getOffer().getUser().getLocation().getLocationname());
     }
 
     private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
