@@ -9,8 +9,8 @@ package edible.simple.model.dataEnum;
  * @version $Id: UnitName.java, v 0.1 2019‐10‐02 18:47 Kevin Hadinata Exp $$
  */
 public enum UnitName {
-    Buah,
-    KG,
-    gram
+    buah,
+    kg,
+    gr
 
 }
