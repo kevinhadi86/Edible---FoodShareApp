@@ -217,13 +217,13 @@ public class OfferController {
     private void fillBaseOfferResponse(BaseOfferResponse baseOfferResponse, Offer offer) {
 
         baseOfferResponse.setId(offer.getId());
-        baseOfferResponse.setCategoryName(offer.getCategory().getName().name());
+        baseOfferResponse.setCategoryName(offer.getCategory().getCategoryName().name());
         baseOfferResponse.setTitle(offer.getTitle());
         baseOfferResponse.setDescription(offer.getDescription());
         baseOfferResponse.setQuantity(offer.getQuantity());
-        baseOfferResponse.setUnit(offer.getUnit().getUnitname().name());
+        baseOfferResponse.setUnit(offer.getUnit().getUnitName().name());
         baseOfferResponse
-            .setExpiryDate(new SimpleDateFormat("yyyy-MM-dd").format(offer.getExpirytime()));
+            .setExpiryDate(new SimpleDateFormat("yyyy-MM-dd").format(offer.getExpiryDate()));
         List<String> imageUrls = new ArrayList<>();
         for (OfferImage offerImage : offer.getOfferImages()) {
             imageUrls.add(offerImage.getUrl());
@@ -241,7 +241,7 @@ public class OfferController {
         BeanUtils.copyProperties(offer.getUser(), baseUserResponse);
         otherUserOfferResponse.setUser(baseUserResponse);
 
-        otherUserOfferResponse.setLocation(offer.getUser().getLocation().getLocationname());
+        otherUserOfferResponse.setLocation(offer.getUser().getLocation().getLocationName());
     }
 
     private void fillOfferRequest(Offer offer, AddNewOfferRequest addNewOfferRequest) {
@@ -265,7 +265,7 @@ public class OfferController {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        offer.setExpirytime(expiryTime);
+        offer.setExpiryDate(expiryTime);
     }
 
     private void fillOfferImages(Set<OfferImage> offerImages, Offer offer,

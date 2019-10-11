@@ -21,16 +21,17 @@ public class Location {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
-    private String locationname;
+    @Column(name = "location_name")
+    private String locationName;
     private String longitude;
     private String latitude;
 
     public Location() {
     }
 
-    public Location(User user, @NotBlank String locationname) {
+    public Location(User user, @NotBlank String locationName) {
         this.user = user;
-        this.locationname = locationname;
+        this.locationName = locationName;
     }
 
     public User getUser() {
@@ -49,12 +50,12 @@ public class Location {
         this.id = id;
     }
 
-    public String getLocationname() {
-        return locationname;
+    public String getLocationName() {
+        return locationName;
     }
 
-    public void setLocationname(String locationname) {
-        this.locationname = locationname;
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 
     public String getLongitude() {

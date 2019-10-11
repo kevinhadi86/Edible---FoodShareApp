@@ -19,6 +19,6 @@ import edible.simple.model.dataEnum.UnitName;
 @Repository
 public interface UnitRepository extends JpaRepository<Unit, Long> {
 
-    public Optional<Unit> findByUnitname(UnitName name);
+    public Optional<Unit> findByUnitName(UnitName name);
 
 }

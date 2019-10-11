@@ -35,7 +35,8 @@ public class Transaction extends DataAudit {
     private Float quantity;
     @NotNull
     private StatusEnum status;
-    private Date pickuptime;
+    @Column(name = "pickup_time")
+    private Date pickupTime;
 
     public Long getId() {
         return id;
@@ -85,11 +86,11 @@ public class Transaction extends DataAudit {
         this.status = status;
     }
 
-    public Date getPickuptime() {
-        return pickuptime;
+    public Date getPickupTime() {
+        return pickupTime;
     }
 
-    public void setPickuptime(Date pickuptime) {
-        this.pickuptime = pickuptime;
+    public void setPickupTime(Date pickupTime) {
+        this.pickupTime = pickupTime;
     }
 }

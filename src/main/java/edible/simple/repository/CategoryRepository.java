@@ -19,5 +19,5 @@ import edible.simple.model.dataEnum.CategoryName;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category,Long> {
 
-    public Optional<Category> findByName(CategoryName name);
+    public Optional<Category> findByCategoryName(CategoryName name);
 }

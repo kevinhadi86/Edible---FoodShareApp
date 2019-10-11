@@ -24,14 +24,14 @@ public class Category {
 
     @Enumerated(EnumType.STRING)
     @NaturalId
-    @Column(length = 60)
-    private CategoryName name;
+    @Column(name = "category_name")
+    private CategoryName categoryName;
 
     public Category() {
     }
 
-    public Category(CategoryName name) {
-        this.name = name;
+    public Category(CategoryName categoryName) {
+        this.categoryName = categoryName;
     }
 
     public Long getId() {
@@ -42,11 +42,11 @@ public class Category {
         this.id = id;
     }
 
-    public CategoryName getName() {
-        return name;
+    public CategoryName getCategoryName() {
+        return categoryName;
     }
 
-    public void setName(CategoryName name) {
-        this.name = name;
+    public void setCategoryName(CategoryName categoryName) {
+        this.categoryName = categoryName;
     }
 }

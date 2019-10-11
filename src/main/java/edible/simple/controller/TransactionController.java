@@ -66,10 +66,10 @@ public class TransactionController {
 
             transactionResponse.setId(transaction.getId());
             transactionResponse.setStatus(transaction.getStatus().name());
-            transactionResponse.setUnit(transaction.getUnit().getUnitname().name());
+            transactionResponse.setUnit(transaction.getUnit().getUnitName().name());
             transactionResponse.setQuantity(transaction.getQuantity());
             transactionResponse
-                .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickuptime()));
+                .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickupTime()));
 
             BaseUserResponse userResponse = new BaseUserResponse();
             BeanUtils.copyProperties(transaction.getUser(), userResponse);
@@ -101,10 +101,10 @@ public class TransactionController {
 
                 transactionResponse.setId(transaction.getId());
                 transactionResponse.setStatus(transaction.getStatus().name());
-                transactionResponse.setUnit(transaction.getUnit().getUnitname().name());
+                transactionResponse.setUnit(transaction.getUnit().getUnitName().name());
                 transactionResponse.setQuantity(transaction.getQuantity());
                 transactionResponse
-                        .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickuptime()));
+                        .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickupTime()));
 
                 BaseUserResponse userResponse = new BaseUserResponse();
                 BeanUtils.copyProperties(transaction.getUser(), userResponse);
@@ -150,7 +150,7 @@ public class TransactionController {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            transaction.setPickuptime(pickupTime);
+            transaction.setPickupTime(pickupTime);
 
             if (transactionService.saveTransaction(transaction) != null) {
                 return new ResponseEntity(new ApiResponse(true, "Success add transaction"),
@@ -214,7 +214,7 @@ public class TransactionController {
             && transaction.getOffer().getUser().getId() != userPrincipal.getId()) {
 
             transaction.setStatus(StatusEnum.DONE);
-            transaction.setPickuptime(new Date());
+            transaction.setPickupTime(new Date());
 
             if (transactionService.saveTransaction(transaction) != null) {
                 return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
@@ -247,9 +247,9 @@ public class TransactionController {
                                    Transaction transaction) {
 
         BeanUtils.copyProperties(transaction.getOffer(), otherUserOfferResponse);
-        otherUserOfferResponse.setUnit(transaction.getUnit().getUnitname().name());
+        otherUserOfferResponse.setUnit(transaction.getUnit().getUnitName().name());
         otherUserOfferResponse.setExpiryDate(
-            new SimpleDateFormat("yyyy-MM-dd").format(transaction.getOffer().getExpirytime()));
+            new SimpleDateFormat("yyyy-MM-dd").format(transaction.getOffer().getExpiryDate()));
 
         List<String> imageUrls = new ArrayList<>();
         for (OfferImage offerImage : transaction.getOffer().getOfferImages()) {
@@ -262,13 +262,13 @@ public class TransactionController {
         otherUserOfferResponse.setUser(baseUserResponse);
 
         otherUserOfferResponse
-            .setLocation(transaction.getOffer().getUser().getLocation().getLocationname());
+            .setLocation(transaction.getOffer().getUser().getLocation().getLocationName());
     }
 
     private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
         Date now = new Date();
         if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() > 0
-            && offer.getExpirytime().compareTo(now) < 0) {
+            && offer.getExpiryDate().compareTo(now) < 0) {
             return true;
         }
         return false;

@@ -26,7 +26,7 @@ public class UnitServiceImpl implements UnitService {
     @Override
     public Unit getUnitByName(UnitName name) {
 
-        Optional<Unit> unit = unitRepository.findByUnitname(name);
+        Optional<Unit> unit = unitRepository.findByUnitName(name);
 
         if(unit.isPresent()){
             return unit.get();

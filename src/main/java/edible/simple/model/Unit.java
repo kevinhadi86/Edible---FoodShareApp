@@ -24,8 +24,8 @@ public class Unit {
 
     @Enumerated(EnumType.STRING)
     @NaturalId
-    @Column(length = 60)
-    private UnitName unitname;
+    @Column(name = "unit_name")
+    private UnitName unitName;
 
     public Long getId() {
         return id;
@@ -35,11 +35,11 @@ public class Unit {
         this.id = id;
     }
 
-    public UnitName getUnitname() {
-        return unitname;
+    public UnitName getUnitName() {
+        return unitName;
     }
 
-    public void setUnitname(UnitName unitname) {
-        this.unitname = unitname;
+    public void setUnitName(UnitName unitName) {
+        this.unitName = unitName;
     }
 }

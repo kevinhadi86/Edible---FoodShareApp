@@ -34,7 +34,8 @@ public class Offer extends DataAudit {
     private String title;
     private String description;
     private Float quantity;
-    private Date expirytime;
+    @Column(name = "expiry_date")
+    private Date expiryDate;
 
     @OneToMany(mappedBy = "offer")
     private Set<OfferImage> offerImages = new HashSet<>();
@@ -98,12 +99,12 @@ public class Offer extends DataAudit {
         this.unit = unit;
     }
 
-    public Date getExpirytime() {
-        return expirytime;
+    public Date getExpiryDate() {
+        return expiryDate;
     }
 
-    public void setExpirytime(Date expirytime) {
-        this.expirytime = expirytime;
+    public void setExpiryDate(Date expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public Set<OfferImage> getOfferImages() {
@@ -114,8 +115,4 @@ public class Offer extends DataAudit {
         this.offerImages = offerImages;
     }
 
-    public void addOfferImage(OfferImage offerImage){
-        offerImage.setOffer(this);
-        offerImages.add(offerImage);
-    }
 }

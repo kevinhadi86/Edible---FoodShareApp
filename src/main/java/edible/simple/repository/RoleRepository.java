@@ -18,5 +18,5 @@ import edible.simple.model.dataEnum.RoleName;
  */
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
-    Optional<Role> findByName(RoleName roleName);
+    Optional<Role> findByRoleName(RoleName roleName);
 }
