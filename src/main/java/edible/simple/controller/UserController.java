@@ -116,10 +116,12 @@ public class UserController {
             user.setName(updateUserRequest.getName());
             user.setPhonenumber(updateUserRequest.getPhoneNumber());
 
-            String baseUrl = String.format("%s://%s:%d/api/image/files/",request.getScheme(),  request.getServerName(), request.getServerPort());
-            String imageUrl = storageService.store(updateUserRequest.getImageUrl(),baseUrl);
+            if(!updateUserRequest.getImageUrl().equals(null)){
 
-            user.setImageurl(imageUrl);
+                String baseUrl = String.format("%s://%s:%d/api/image/files/",request.getScheme(),  request.getServerName(), request.getServerPort());
+                String imageUrl = storageService.store(updateUserRequest.getImageUrl(),baseUrl);
+                user.setImageurl(imageUrl);
+            }
 
             user.setBio(updateUserRequest.getBio());
 
