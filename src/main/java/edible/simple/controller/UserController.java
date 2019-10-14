@@ -116,7 +116,7 @@ public class UserController {
             user.setName(updateUserRequest.getName());
             user.setPhonenumber(updateUserRequest.getPhoneNumber());
 
-            if(!updateUserRequest.getImageUrl().equals(null)){
+            if(updateUserRequest.getImageUrl()!=null){
 
                 String baseUrl = String.format("%s://%s:%d/api/image/files/",request.getScheme(),  request.getServerName(), request.getServerPort());
                 String imageUrl = storageService.store(updateUserRequest.getImageUrl(),baseUrl);
