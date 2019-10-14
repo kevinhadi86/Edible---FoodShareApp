@@ -8,7 +8,7 @@ public class BaseUserResponse {
     private String name;
     @Email
     private String email;
-    private String phonenumber;
+    private String phoneNumber;
     private String imageurl;
     private String bio;
     private int rating;
@@ -64,12 +64,12 @@ public class BaseUserResponse {
         this.bio = bio;
     }
 
-    public String getPhonenumber() {
-        return phonenumber;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhonenumber(String phonenumber) {
-        this.phonenumber = phonenumber;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public int getRating() {
