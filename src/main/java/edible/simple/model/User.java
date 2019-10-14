@@ -31,7 +31,6 @@ public class User extends DataAudit {
     private String        username;
     @NotBlank
     @Size(max = 255)
-    @NaturalId
     @Email
     private String        email;
     @NotBlank
