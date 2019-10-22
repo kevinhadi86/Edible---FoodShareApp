@@ -58,8 +58,8 @@ public class AuthController {
     JavaMailSender        javaMailSender;
 
     @GetMapping("/HelloWorld")
-    public ResponseEntity<ApiResponse> helloWorld(){
-        return new ResponseEntity(new ApiResponse(true,"Hello World"),HttpStatus.OK);
+    public ResponseEntity<ApiResponse> helloWorld() {
+        return new ResponseEntity(new ApiResponse(true, "Hello World"), HttpStatus.OK);
     }
 
     @PostMapping("/signin")
@@ -75,52 +75,86 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SaveNewUserRequest signUpRequest) {
 
-        if(userService.saveNewUser(signUpRequest)){
-            return new ResponseEntity(new ApiResponse(true, "Success Register User"), HttpStatus.OK);
+        if (userService.saveNewUser(signUpRequest)) {
+            return new ResponseEntity(new ApiResponse(true, "Success Register User"),
+                HttpStatus.OK);
         }
 
-        return new ResponseEntity(new ApiResponse(false, "Failed Register User"), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(new ApiResponse(false, "Failed Register User"),
+            HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/sendConfirmationResetPasswordMail")
     public ResponseEntity<ApiResponse> sendConfirmationResetPasswordMail(@RequestBody ResetPasswordRequest resetPasswordRequest) {
         User user = userService.getUserByEmail(resetPasswordRequest.getEmail());
-        if (user != null) {
-            Date now = new Date();
-            String nowMiliseconds = Long.toString(now.getTime());
-            String token = Base64.getEncoder()
-                .encodeToString((user.getEmail() + "%%" + nowMiliseconds).getBytes());
-            String url = "http://localhost:9002/api/auth/sendResetPasswordMail/" + token;
-            String message = "Hello, this is from Edible. Please open this link and wait for another email if you want to confirm your password reset for your Edible account, here is the link: "
-                             + url;
-            userService.sendResetPasswordEmail(user.getEmail(), message);
-            return new ResponseEntity(
-                new ApiResponse(true, "Reset password email sent successfully"), HttpStatus.OK);
+
+        if (user == null) {
+            return new ResponseEntity(new ApiResponse(false, "Email not Exists"),
+                HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(new ApiResponse(false, "Email not Exists"),
-            HttpStatus.BAD_REQUEST);
+
+        String token = createToken(user.getEmail());
+
+        String url = "http://localhost:9002/api/auth/sendResetPasswordMail/" + token;
+        String message = "Hello, this is from Edible. Please open this link and wait for another email if you want to confirm your password reset for your Edible account, here is the link: "
+                         + url;
+        userService.sendResetPasswordEmail(user.getEmail(), message);
+        return new ResponseEntity(new ApiResponse(true, "Reset password email sent successfully"),
+            HttpStatus.OK);
+
     }
 
     @GetMapping("/sendResetPasswordMail/{token}")
     public ResponseEntity<ApiResponse> sendResetPasswordMail(@PathVariable String token) {
+
+        if (token == null) {
+            return new ResponseEntity(new ApiResponse(false, "Request Invalid"),
+                HttpStatus.BAD_REQUEST);
+        }
+
+        String email = getEmailFromToken(token);
+
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            return new ResponseEntity(new ApiResponse(false, "User not Exists"),
+                HttpStatus.BAD_REQUEST);
+        }
+
+        String newPassword = generateNewPassword();
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userService.saveUser(user);
+
+        String message = "Hello, this is from Edible. This is your new password: " + newPassword;
+        userService.sendResetPasswordEmail(user.getEmail(), message);
+
+        return new ResponseEntity(new ApiResponse(true, "Reset password email sent successfully"),
+            HttpStatus.OK);
+
+    }
+
+    private String createToken(String email) {
+
+        Date now = new Date();
+        String nowMiliseconds = Long.toString(now.getTime());
+
+        return Base64.getEncoder().encodeToString((email + "%%" + nowMiliseconds).getBytes());
+    }
+
+    private String getEmailFromToken(String token) {
+
         byte[] decodedToken = Base64.getDecoder().decode(token);
+
         String dataToken = new String(decodedToken);
         String[] data = dataToken.split("%%", 2);
-        String email = data[0];
-        User user = userService.getUserByEmail(email);
-        if (user != null) {
-            Date now = new Date();
-            String newPassword = Long.toString(now.getTime());
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userService.saveUser(user);
 
-            String message = "Hello, this is from Edible. This is your new password: "
-                             + newPassword;
-            userService.sendResetPasswordEmail(user.getEmail(), message);
-            return new ResponseEntity(
-                new ApiResponse(true, "Reset password email sent successfully"), HttpStatus.OK);
-        }
-        return new ResponseEntity(new ApiResponse(false, "Email not Exists"),
-            HttpStatus.BAD_REQUEST);
+        return data[0];
+    }
+
+    private String generateNewPassword() {
+
+        Date now = new Date();
+        return Long.toString(now.getTime());
     }
 }

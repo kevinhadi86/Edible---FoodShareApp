@@ -32,26 +32,27 @@ import edible.simple.security.JwtTokenProvider;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    JwtTokenProvider jwtTokenProvider;
+    JwtTokenProvider   jwtTokenProvider;
 
     @Autowired
-    UserRepository   userRepository;
+    UserRepository     userRepository;
 
     @Autowired
-    PasswordEncoder  passwordEncoder;
+    PasswordEncoder    passwordEncoder;
 
     @Autowired
-    RoleRepository roleRepository;
+    RoleRepository     roleRepository;
 
     @Autowired
-    JavaMailSender javaMailSender;
+    JavaMailSender     javaMailSender;
 
     @Autowired
     LocationRepository locationRepository;
 
     @Override
     public boolean saveNewUser(SaveNewUserRequest saveNewUserRequest) {
-        if (Boolean.TRUE.equals(userRepository.existsByUsername(saveNewUserRequest.getUsername()))) {
+        if (Boolean.TRUE
+            .equals(userRepository.existsByUsername(saveNewUserRequest.getUsername()))) {
             return false;
         }
         if (Boolean.TRUE.equals(userRepository.existsByEmail(saveNewUserRequest.getEmail()))) {
@@ -59,17 +60,17 @@ public class UserServiceImpl implements UserService {
         }
         User user = new User();
 
-        BeanUtils.copyProperties(saveNewUserRequest,user);
+        BeanUtils.copyProperties(saveNewUserRequest, user);
         user.setPhonenumber(saveNewUserRequest.getPhoneNumber());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new AppException("User Role not set."));
+            .orElseThrow(() -> new AppException("User Role not set."));
 
         user.setRoles(Collections.singleton(userRole));
 
-        if(userRepository.save(user).getId()!=null){
+        if (userRepository.save(user).getId() != null) {
             return true;
         }
 
@@ -80,22 +81,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendResetPasswordEmail(String email, String text) {
 
-        Optional<User> user = userRepository.findByEmail(email);
-        if(user.isPresent()){
-            User userValue = user.get();
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(userValue.getEmail());
-            message.setSubject("Reset Password Edible");
-            message.setText(text);
-            message.setFrom("no-reply@edible.com");
-            javaMailSender.send(message);
-        }
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Reset Password Edible");
+        message.setText(text);
+        message.setFrom("no-reply@edible.com");
+        javaMailSender.send(message);
+
     }
 
     @Override
     public User getUserByEmail(String email) {
-        Optional<User> user = userRepository.findByUsernameOrEmail(email,email);
-        if(user.isPresent()){
+        Optional<User> user = userRepository.findByUsernameOrEmail(email, email);
+        if (user.isPresent()) {
             return user.get();
         }
         return null;
@@ -103,8 +101,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
-        Optional<User> user = userRepository.findByUsernameOrEmail(username,username);
-        if(user.isPresent()){
+        Optional<User> user = userRepository.findByUsernameOrEmail(username, username);
+        if (user.isPresent()) {
             return user.get();
         }
         return null;
@@ -113,7 +111,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             return user.get();
         }
         return null;
@@ -121,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean saveUser(User user) {
-        if(!userRepository.save(user).equals(null)){
+        if (!userRepository.save(user).equals(null)) {
             return true;
         }
         return false;

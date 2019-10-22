@@ -30,22 +30,18 @@ public class JwtTokenProvider {
     private String              jwtSecret;
 
     @Value("${app.jwtExpirationInMs}")
-    private long                 jwtExpirationInMs;
+    private long                jwtExpirationInMs;
 
     @Autowired
-    UserRepository userRepository;
+    UserRepository              userRepository;
 
-    public String generateToken(String usernameOrEmail) {
-        Optional<User> user = userRepository.findByUsernameOrEmail(usernameOrEmail,usernameOrEmail);
-        if(user.isPresent()){
-            User userValue = user.get();
-            Date now = new Date();
-            Date expirtDate = new Date(now.getTime() + jwtExpirationInMs);
-            return Jwts.builder().setSubject(Long.toString(userValue.getId()))
-                    .setIssuedAt(new Date()).setExpiration(expirtDate)
-                    .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
-        }
-        return null;
+    public String generateToken(User user) {
+
+        Date now = new Date();
+        Date expirtDate = new Date(now.getTime() + jwtExpirationInMs);
+        return Jwts.builder().setSubject(Long.toString(user.getId()))
+            .setIssuedAt(new Date()).setExpiration(expirtDate)
+            .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
     }
 
     public Long getUserIdFromJWT(String token) {

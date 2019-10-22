@@ -20,6 +20,7 @@ public class BaseOfferResponse {
     private String       unit;
     private String       expiryDate;
     private List<String> imageUrls;
+    private String       createdTime;
 
     public Long getId() {
         return id;
@@ -83,5 +84,13 @@ public class BaseOfferResponse {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+
+    public String getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
     }
 }
