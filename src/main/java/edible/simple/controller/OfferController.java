@@ -230,7 +230,7 @@ public class OfferController {
         }
         baseOfferResponse.setImageUrls(imageUrls);
         baseOfferResponse
-                .setCreatedTime(new SimpleDateFormat("yyyy-MM-dd").format(offer.getCreatedAt()));
+                .setCreatedTime(String.valueOf(offer.getCreatedAt()));
     }
 
     private void fillOtherUserOfferResponse(OtherUserOfferResponse otherUserOfferResponse,
