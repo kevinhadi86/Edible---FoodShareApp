@@ -185,10 +185,10 @@ public class OfferController {
         return new ResponseEntity(new ApiResponse(true, "success to update"), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse> deleteOffer(@CurrentUser UserPrincipal userPrincipal,
-                                                   @RequestBody DeleteOfferRequest deleteOfferRequest) {
-        Offer offer = offerService.getOfferById(deleteOfferRequest.getId());
+                                                   @PathVariable String id) {
+        Offer offer = offerService.getOfferById(Long.parseLong(id));
 
         if (offer.getUser().getId() == userPrincipal.getId()) {
             offerService.deleteOfferImage(offer);
