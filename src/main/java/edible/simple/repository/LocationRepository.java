@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import edible.simple.model.Location;
 import edible.simple.model.User;
 
+import java.util.Set;
+
 /**
  * @author Kevin Hadinata
  * @version $Id: LocationRepository.java, v 0.1 2019‐09‐18 17:00 Kevin Hadinata Exp $$
@@ -17,5 +19,7 @@ import edible.simple.model.User;
 @Repository
 public interface LocationRepository extends JpaRepository<Location,Long> {
 
-    public Location getByUser(User user);
+    public Location getLocationByCity(String city);
+
+    public Set<Location> findAllByProvince(String province);
 }

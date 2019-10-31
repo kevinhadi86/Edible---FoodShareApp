@@ -36,6 +36,14 @@ public class Offer extends DataAudit {
     private Float quantity;
     @Column(name = "expiry_date")
     private Date expiryDate;
+    @Column(name = "is_cod")
+    private boolean isCod;
+    @Column(name = "cod_description")
+    private String CodDescription;
+    @Column(name = "is_delivery")
+    private boolean isDelivery;
+    @Column(name = "delivery_description")
+    private String DeliveryDescription;
 
     @OneToMany(mappedBy = "offer")
     private Set<OfferImage> offerImages = new HashSet<>();
@@ -115,4 +123,35 @@ public class Offer extends DataAudit {
         this.offerImages = offerImages;
     }
 
+    public boolean isCod() {
+        return isCod;
+    }
+
+    public void setCod(boolean cod) {
+        isCod = cod;
+    }
+
+    public String getCodDescription() {
+        return CodDescription;
+    }
+
+    public void setCodDescription(String codDescription) {
+        CodDescription = codDescription;
+    }
+
+    public boolean isDelivery() {
+        return isDelivery;
+    }
+
+    public void setDelivery(boolean delivery) {
+        isDelivery = delivery;
+    }
+
+    public String getDeliveryDescription() {
+        return DeliveryDescription;
+    }
+
+    public void setDeliveryDescription(String deliveryDescription) {
+        DeliveryDescription = deliveryDescription;
+    }
 }

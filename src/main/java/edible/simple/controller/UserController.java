@@ -43,13 +43,10 @@ public class UserController {
     CategoryService categoryService;
 
     @Autowired
-    LocationService locationService;
-
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    StorageService storageService;
+    StorageService  storageService;
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
@@ -96,7 +93,7 @@ public class UserController {
 
     @PostMapping("/me/update")
     public ResponseEntity<ApiResponse> updateUserProfile(@CurrentUser UserPrincipal userPrincipal,
-                                                         @RequestBody UpdateUserRequest updateUserRequest, HttpServletRequest request) {
+                                                         @RequestBody UpdateUserRequest updateUserRequest) {
 
         User user = userService.getUserByEmail(userPrincipal.getEmail());
 
@@ -115,50 +112,22 @@ public class UserController {
             user.setUsername(updateUserRequest.getUsername());
             user.setName(updateUserRequest.getName());
             user.setPhonenumber(updateUserRequest.getPhoneNumber());
-
-            if(updateUserRequest.getImageUrl()!=null){
-
-                String baseUrl = String.format("%s://%s:%d/api/image/files/",request.getScheme(),  request.getServerName(), request.getServerPort());
-                String imageUrl = storageService.store(updateUserRequest.getImageUrl(),baseUrl);
-                user.setImageurl(imageUrl);
-            }
-
             user.setBio(updateUserRequest.getBio());
+            user.setImageurl(updateUserRequest.getImageUrl());
 
-            if(userService.saveUser(user)){
+            user.setCity(updateUserRequest.getCity());
+
+            if (userService.saveUser(user)) {
 
                 return new ResponseEntity(new ApiResponse(true, "Update profile success"),
-                        HttpStatus.OK);
+                    HttpStatus.OK);
             }
             return new ResponseEntity(new ApiResponse(false, "failed update user"),
-                    HttpStatus.BAD_REQUEST);
+                HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity(new ApiResponse(false, "failed update user because id is different"),
+        return new ResponseEntity(
+            new ApiResponse(false, "failed update user because id is different"),
             HttpStatus.BAD_REQUEST);
     }
-
-    @PostMapping("/me/location")
-    public ResponseEntity<ApiResponse> setUserLocation(@CurrentUser UserPrincipal userPrincipal,
-                                                       @RequestBody UserLocationRequest userLocationRequest) {
-
-        User user = userService.getUserById(userPrincipal.getId());
-
-        Location location = locationService.getLocationByUser(user);
-
-        if (location == null) {
-            location = new Location(user, userLocationRequest.getName());
-        } else {
-            location.setLocationName(userLocationRequest.getName());
-        }
-
-        if (locationService.saveLocation(location)) {
-            return new ResponseEntity(new ApiResponse(true, "Success set user location"),
-                HttpStatus.OK);
-        }
-
-        return new ResponseEntity(new ApiResponse(false, "Failed set user location"),
-            HttpStatus.BAD_REQUEST);
-    }
-
 }

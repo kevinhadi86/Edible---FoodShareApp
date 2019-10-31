@@ -22,6 +22,8 @@ public class SaveUserRequest {
     private String username;
     @NotBlank
     private String phoneNumber;
+    @NotBlank
+    private String city;
 
     public SaveUserRequest() {
     }
@@ -56,5 +58,13 @@ public class SaveUserRequest {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

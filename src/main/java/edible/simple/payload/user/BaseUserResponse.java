@@ -1,5 +1,7 @@
 package edible.simple.payload.user;
 
+import edible.simple.model.Location;
+
 import javax.validation.constraints.Email;
 
 public class BaseUserResponse {
@@ -12,6 +14,7 @@ public class BaseUserResponse {
     private String imageurl;
     private String bio;
     private int rating;
+    private String city;
 
     public BaseUserResponse() {
     }
@@ -79,4 +82,13 @@ public class BaseUserResponse {
     public void setRating(int rating) {
         this.rating = rating;
     }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
 }

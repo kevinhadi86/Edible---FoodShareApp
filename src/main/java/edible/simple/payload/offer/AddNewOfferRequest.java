@@ -20,6 +20,10 @@ public class AddNewOfferRequest {
     private Float        quantity;
     private String       expiryTime;
     private List<String> imageUrl = new ArrayList<>();
+    private boolean      isCod;
+    private String       codDescription;
+    private boolean      isDelivery;
+    private String       deliveryDescription;
 
     public String getCategory() {
         return category;
@@ -75,5 +79,37 @@ public class AddNewOfferRequest {
 
     public void setImageUrl(List<String> imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public boolean isCod() {
+        return isCod;
+    }
+
+    public void setCod(boolean cod) {
+        isCod = cod;
+    }
+
+    public String getCodDescription() {
+        return codDescription;
+    }
+
+    public void setCodDescription(String codDescription) {
+        this.codDescription = codDescription;
+    }
+
+    public boolean isDelivery() {
+        return isDelivery;
+    }
+
+    public void setDelivery(boolean delivery) {
+        isDelivery = delivery;
+    }
+
+    public String getDeliveryDescription() {
+        return deliveryDescription;
+    }
+
+    public void setDeliveryDescription(String deliveryDescription) {
+        this.deliveryDescription = deliveryDescription;
     }
 }

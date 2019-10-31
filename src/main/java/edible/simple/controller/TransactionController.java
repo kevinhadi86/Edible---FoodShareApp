@@ -133,14 +133,7 @@ public class TransactionController {
             transaction.setUser(userService.getUserById(userPrincipal.getId()));
             transaction.setOffer(offer);
             transaction.setQuantity(request.getQuantity());
-
-            UnitName unitName = UnitName.valueOf(request.getUnit());
-            if (unitName == null) {
-                return new ResponseEntity(new ApiResponse(false, "unit not valid"),
-                    HttpStatus.BAD_REQUEST);
-            }
-            Unit unit = unitService.getUnitByName(unitName);
-            transaction.setUnit(unit);
+            transaction.setUnit(offer.getUnit());
 
             transaction.setStatus(StatusEnum.INIT);
 
@@ -262,7 +255,7 @@ public class TransactionController {
         otherUserOfferResponse.setUser(baseUserResponse);
 
         otherUserOfferResponse
-            .setLocation(transaction.getOffer().getUser().getLocation().getLocationName());
+            .setLocation(transaction.getOffer().getUser().getCity());
     }
 
     private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {

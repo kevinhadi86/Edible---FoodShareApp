@@ -8,8 +8,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +18,10 @@ import edible.simple.model.*;
 import edible.simple.model.dataEnum.CategoryName;
 import edible.simple.model.dataEnum.UnitName;
 import edible.simple.payload.ApiResponse;
-import edible.simple.payload.offer.*;
+import edible.simple.payload.offer.AddNewOfferRequest;
+import edible.simple.payload.offer.BaseOfferResponse;
+import edible.simple.payload.offer.OtherUserOfferResponse;
+import edible.simple.payload.offer.UpdateOfferRequest;
 import edible.simple.payload.user.BaseUserResponse;
 import edible.simple.security.CurrentUser;
 import edible.simple.security.UserPrincipal;
@@ -105,7 +106,7 @@ public class OfferController {
     public List<OtherUserOfferResponse> getOfferByCategory(@PathVariable String category) {
 
         Category searchCategory = categoryService
-            .getCategoryByName(CategoryName.valueOf(category.toUpperCase()));
+            .getCategoryByName(CategoryName.getByCode(category));
 
         List<Offer> offers = offerService.getOfferByCategory(searchCategory);
         List<OtherUserOfferResponse> offersByCategory = new ArrayList<>();
@@ -122,10 +123,10 @@ public class OfferController {
         return offersByCategory;
     }
 
+
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addNewOffer(@CurrentUser UserPrincipal userPrincipal,
-                                                   @RequestBody AddNewOfferRequest addNewOfferRequest,
-                                                   HttpServletRequest request) {
+                                                   @RequestBody AddNewOfferRequest addNewOfferRequest) {
 
         User user = userService.getUserById(userPrincipal.getId());
 
@@ -142,7 +143,7 @@ public class OfferController {
         Offer newOffer = offerService.saveOffer(offer);
 
         Set<OfferImage> offerImages = new HashSet<>();
-        fillOfferImages(offerImages, newOffer, addNewOfferRequest, request);
+        fillOfferImages(offerImages, newOffer, addNewOfferRequest);
 
         offerService.saveOfferImages(offer, offerImages);
 
@@ -155,7 +156,7 @@ public class OfferController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<ApiResponse> updateOffer(@RequestBody UpdateOfferRequest updateOfferRequest, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse> updateOffer(@RequestBody UpdateOfferRequest updateOfferRequest) {
 
         Offer offer = offerService.getOfferById(updateOfferRequest.getId());
 
@@ -173,7 +174,7 @@ public class OfferController {
 
         if(updateOfferRequest.getImageUrl()!=null){
             Set<OfferImage> offerImages = new HashSet<>();
-            fillOfferImages(offerImages, offer, updateOfferRequest, request);
+            fillOfferImages(offerImages, offer, updateOfferRequest);
 
             if (offerService.saveOfferImages(offer, offerImages) == null) {
                 return new ResponseEntity(new ApiResponse(false, "fail to update image"),
@@ -201,7 +202,7 @@ public class OfferController {
 
     private boolean checkOfferRequest(AddNewOfferRequest addNewOfferRequest) {
 
-        CategoryName categoryName = CategoryName.valueOf(addNewOfferRequest.getCategory());
+        CategoryName categoryName = CategoryName.getByCode(addNewOfferRequest.getCategory());
         if (categoryName == null) {
             return true;
         }
@@ -217,7 +218,7 @@ public class OfferController {
     private void fillBaseOfferResponse(BaseOfferResponse baseOfferResponse, Offer offer) {
 
         baseOfferResponse.setId(offer.getId());
-        baseOfferResponse.setCategoryName(offer.getCategory().getCategoryName().name());
+        baseOfferResponse.setCategoryName(offer.getCategory().getCategoryName().toString());
         baseOfferResponse.setTitle(offer.getTitle());
         baseOfferResponse.setDescription(offer.getDescription());
         baseOfferResponse.setQuantity(offer.getQuantity());
@@ -231,6 +232,14 @@ public class OfferController {
         baseOfferResponse.setImageUrls(imageUrls);
         baseOfferResponse
                 .setCreatedTime(String.valueOf(offer.getCreatedAt()));
+        if(offer.isCod()){
+            baseOfferResponse.setCod(true);
+            baseOfferResponse.setCodDescription(offer.getCodDescription());
+        }
+        if(offer.isDelivery()){
+            baseOfferResponse.setDelivery(true);
+            baseOfferResponse.setDeliveryDescription(offer.getDeliveryDescription());
+        }
     }
 
     private void fillOtherUserOfferResponse(OtherUserOfferResponse otherUserOfferResponse,
@@ -242,12 +251,12 @@ public class OfferController {
         BeanUtils.copyProperties(offer.getUser(), baseUserResponse);
         otherUserOfferResponse.setUser(baseUserResponse);
 
-        otherUserOfferResponse.setLocation(offer.getUser().getLocation().getLocationName());
+        otherUserOfferResponse.setLocation(offer.getUser().getCity());
     }
 
     private void fillOfferRequest(Offer offer, AddNewOfferRequest addNewOfferRequest) {
 
-        CategoryName categoryName = CategoryName.valueOf(addNewOfferRequest.getCategory());
+        CategoryName categoryName = CategoryName.getByCode(addNewOfferRequest.getCategory());
         Category category = categoryService.getCategoryByName(categoryName);
         offer.setCategory(category);
 
@@ -267,21 +276,25 @@ public class OfferController {
             e.printStackTrace();
         }
         offer.setExpiryDate(expiryTime);
+
+        if(addNewOfferRequest.isCod()){
+
+            offer.setCod(true);
+            offer.setCodDescription(addNewOfferRequest.getCodDescription());
+        }
+        if(addNewOfferRequest.isDelivery()){
+
+            offer.setDelivery(true);
+            offer.setDeliveryDescription(addNewOfferRequest.getDeliveryDescription());
+        }
     }
 
     private void fillOfferImages(Set<OfferImage> offerImages, Offer offer,
-                                 AddNewOfferRequest addNewOfferRequest,
-                                 HttpServletRequest request) {
-
-
+                                 AddNewOfferRequest addNewOfferRequest) {
 
         for (String url : addNewOfferRequest.getImageUrl()) {
 
-            String baseUrl = String.format("%s://%s:%d/api/image/files/", request.getScheme(),
-                    request.getServerName(), request.getServerPort());
-            String imageUrl = storageService.store(url, baseUrl);
-
-            OfferImage offerImage = new OfferImage(offer, imageUrl);
+            OfferImage offerImage = new OfferImage(offer, url);
             offerImages.add(offerImage);
         }
     }

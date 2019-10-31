@@ -4,8 +4,9 @@
  */
 package edible.simple.service;
 
+import java.util.Set;
+
 import edible.simple.model.Location;
-import edible.simple.model.User;
 
 /**
  * @author Kevin Hadinata
@@ -13,7 +14,10 @@ import edible.simple.model.User;
  */
 public interface LocationService {
 
-    public boolean saveLocation(Location location);
+    public Location getLocationByCity(String city);
 
-    public Location getLocationByUser(User user);
+    public Set<String> getAllProvince();
+
+    public Set<String> getCityByProvince(String province);
+
 }

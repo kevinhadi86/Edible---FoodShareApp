@@ -25,46 +25,47 @@ public class User extends DataAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long          id;
+    private Long       id;
     @NotBlank
     @Size(max = 255)
-    private String        username;
+    private String     username;
     @NotBlank
     @Size(max = 255)
     @Email
-    private String        email;
+    private String     email;
     @NotBlank
     @Size(max = 255)
-    private String        password;
+    private String     password;
     @NotBlank
     @Size(max = 255)
-    private String        name;
+    private String     name;
     @Size(max = 255)
-    private String        bio;
+    private String     bio;
     @Size(max = 30)
-    private String        phonenumber;
-    private String        imageurl;
-    private int           rating;
+    private String     phonenumber;
+    private String     imageurl;
+    private int        rating;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role>     roles       = new HashSet<>();
+    private Set<Role>  roles  = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<Offer> offers = new HashSet<>();
 
-    @OneToOne(mappedBy = "user")
-    private Location location;
+    private String   city;
 
     public User() {
     }
 
-    public User(String name, String username, String email, String password, String phonenumber) {
+    public User(String name, String username, String email, String password, String phonenumber,
+                String city) {
         this.name = name;
         this.username = username;
         this.email = email;
         this.password = password;
         this.phonenumber = phonenumber;
+        this.city = city;
     }
 
     public Long getId() {
@@ -155,11 +156,11 @@ public class User extends DataAudit {
         this.offers = offers;
     }
 
-    public Location getLocation() {
-        return location;
+    public String getCity() {
+        return city;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setCity(String city) {
+        this.city = city;
     }
 }

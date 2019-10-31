@@ -6,6 +6,7 @@ package edible.simple.controller;
 
 import java.util.Base64;
 import java.util.Date;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -26,6 +27,7 @@ import edible.simple.payload.user.SaveNewUserRequest;
 import edible.simple.repository.RoleRepository;
 import edible.simple.security.JwtTokenProvider;
 import edible.simple.service.AuthService;
+import edible.simple.service.LocationService;
 import edible.simple.service.UserService;
 
 /**
@@ -56,6 +58,9 @@ public class AuthController {
 
     @Autowired
     JavaMailSender        javaMailSender;
+
+    @Autowired
+    LocationService locationService;
 
     @GetMapping("/HelloWorld")
     public ResponseEntity<ApiResponse> helloWorld() {
@@ -132,6 +137,16 @@ public class AuthController {
         return new ResponseEntity(new ApiResponse(true, "Reset password email sent successfully"),
             HttpStatus.OK);
 
+    }
+
+    @GetMapping("/getProvince")
+    public Set<String> getAllProvince(){
+        return locationService.getAllProvince();
+    }
+
+    @GetMapping("/getCity/{province}")
+    public Set<String> getCityByProvince(@PathVariable String province){
+        return locationService.getCityByProvince(province);
     }
 
     private String createToken(String email) {

@@ -21,6 +21,10 @@ public class BaseOfferResponse {
     private String       expiryDate;
     private List<String> imageUrls;
     private String       createdTime;
+    private boolean      isCod;
+    private String       codDescription;
+    private boolean      isDelivery;
+    private String       deliveryDescription;
 
     public Long getId() {
         return id;
@@ -92,5 +96,37 @@ public class BaseOfferResponse {
 
     public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
+    }
+
+    public boolean isCod() {
+        return isCod;
+    }
+
+    public void setCod(boolean cod) {
+        isCod = cod;
+    }
+
+    public String getCodDescription() {
+        return codDescription;
+    }
+
+    public void setCodDescription(String codDescription) {
+        this.codDescription = codDescription;
+    }
+
+    public boolean isDelivery() {
+        return isDelivery;
+    }
+
+    public void setDelivery(boolean delivery) {
+        isDelivery = delivery;
+    }
+
+    public String getDeliveryDescription() {
+        return deliveryDescription;
+    }
+
+    public void setDeliveryDescription(String deliveryDescription) {
+        this.deliveryDescription = deliveryDescription;
     }
 }
