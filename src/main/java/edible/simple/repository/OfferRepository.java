@@ -26,4 +26,8 @@ public interface OfferRepository extends JpaRepository<Offer,Long> {
 
     public List<Offer> getAllByUserOrderByCreatedAtDesc(User user);
 
+    public List<Offer> getAllByTitleContaining(String search);
+
+    public List<Offer> getAllByDescriptionContaining(String search);
+
 }

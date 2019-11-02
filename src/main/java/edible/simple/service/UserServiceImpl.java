@@ -5,6 +5,7 @@
 package edible.simple.service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import edible.simple.model.Location;
@@ -118,6 +119,11 @@ public class UserServiceImpl implements UserService {
             return user.get();
         }
         return null;
+    }
+
+    @Override
+    public List<User> getAllUserByUsername(String username) {
+        return userRepository.getAllByUsernameContaining(username);
     }
 
     @Override

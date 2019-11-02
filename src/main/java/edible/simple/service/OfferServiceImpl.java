@@ -70,6 +70,16 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
+    public List<Offer> getOfferByTitle(String title) {
+        return offerRepository.getAllByTitleContaining(title);
+    }
+
+    @Override
+    public List<Offer> getOfferByDescription(String description) {
+        return offerRepository.getAllByDescriptionContaining(description);
+    }
+
+    @Override
     public boolean deleteOffer(Offer offer) {
         offerRepository.delete(offer);
         return true;

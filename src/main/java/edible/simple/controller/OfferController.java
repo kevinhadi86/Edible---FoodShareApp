@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import edible.simple.payload.SearchResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,46 @@ public class OfferController {
 
     @Autowired
     StorageService  storageService;
+
+    @GetMapping("/search/{search}")
+    public SearchResponse search(@PathVariable String search) {
+
+        SearchResponse searchResponse = new SearchResponse();
+        List<BaseOfferResponse> baseOfferResponseList = new ArrayList<>();
+        List<BaseUserResponse> baseUserResponseList = new ArrayList<>();
+
+        List<Offer> offersByTitle = offerService.getOfferByTitle(search);
+        if(!offersByTitle.isEmpty()){
+            for (Offer offer : offersByTitle){
+                BaseOfferResponse offerByTitle = new BaseOfferResponse();
+                fillBaseOfferResponse(offerByTitle,offer);
+                baseOfferResponseList.add(offerByTitle);
+            }
+        }
+
+        List<Offer> offersByDescription = offerService.getOfferByDescription(search);
+        if(!offersByDescription.isEmpty()){
+            for (Offer offer : offersByDescription){
+                BaseOfferResponse offerByDescription = new BaseOfferResponse();
+                fillBaseOfferResponse(offerByDescription,offer);
+                baseOfferResponseList.add(offerByDescription);
+            }
+        }
+
+        List<User> users = userService.getAllUserByUsername(search);
+        if(!users.isEmpty()){
+            for (User user : users){
+                BaseUserResponse userResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(user, userResponse);
+                baseUserResponseList.add(userResponse);
+            }
+        }
+
+        searchResponse.setBaseOfferResponseList(baseOfferResponseList);
+        searchResponse.setBaseUserResponseList(baseUserResponseList);
+
+        return searchResponse;
+    }
 
     @GetMapping("/{id}")
     public OtherUserOfferResponse getOfferById(@PathVariable String id) {
@@ -123,7 +164,6 @@ public class OfferController {
         return offersByCategory;
     }
 
-
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addNewOffer(@CurrentUser UserPrincipal userPrincipal,
                                                    @RequestBody AddNewOfferRequest addNewOfferRequest) {
@@ -172,13 +212,13 @@ public class OfferController {
                 HttpStatus.BAD_REQUEST);
         }
 
-        if(updateOfferRequest.getImageUrl()!=null){
+        if (updateOfferRequest.getImageUrl() != null) {
             Set<OfferImage> offerImages = new HashSet<>();
             fillOfferImages(offerImages, offer, updateOfferRequest);
 
             if (offerService.saveOfferImages(offer, offerImages) == null) {
                 return new ResponseEntity(new ApiResponse(false, "fail to update image"),
-                        HttpStatus.BAD_REQUEST);
+                    HttpStatus.BAD_REQUEST);
             }
 
         }
@@ -230,13 +270,12 @@ public class OfferController {
             imageUrls.add(offerImage.getUrl());
         }
         baseOfferResponse.setImageUrls(imageUrls);
-        baseOfferResponse
-                .setCreatedTime(String.valueOf(offer.getCreatedAt()));
-        if(offer.isCod()){
+        baseOfferResponse.setCreatedTime(String.valueOf(offer.getCreatedAt()));
+        if (offer.isCod()) {
             baseOfferResponse.setCod(true);
             baseOfferResponse.setCodDescription(offer.getCodDescription());
         }
-        if(offer.isDelivery()){
+        if (offer.isDelivery()) {
             baseOfferResponse.setDelivery(true);
             baseOfferResponse.setDeliveryDescription(offer.getDeliveryDescription());
         }
@@ -277,12 +316,12 @@ public class OfferController {
         }
         offer.setExpiryDate(expiryTime);
 
-        if(addNewOfferRequest.isCod()){
+        if (addNewOfferRequest.isCod()) {
 
             offer.setCod(true);
             offer.setCodDescription(addNewOfferRequest.getCodDescription());
         }
-        if(addNewOfferRequest.isDelivery()){
+        if (addNewOfferRequest.isDelivery()) {
 
             offer.setDelivery(true);
             offer.setDeliveryDescription(addNewOfferRequest.getDeliveryDescription());

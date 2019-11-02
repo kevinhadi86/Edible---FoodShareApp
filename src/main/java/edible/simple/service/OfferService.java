@@ -30,6 +30,10 @@ public interface OfferService {
 
     public List<Offer> getOfferByCategory(Category category);
 
+    public List<Offer> getOfferByTitle(String title);
+
+    public List<Offer> getOfferByDescription(String description);
+
     public boolean deleteOffer(Offer offer);
 
     public boolean deleteOfferImage(Offer offer);
