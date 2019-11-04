@@ -8,6 +8,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +91,7 @@ public class AuthController {
     }
 
     @PostMapping("/sendConfirmationResetPasswordMail")
-    public ResponseEntity<ApiResponse> sendConfirmationResetPasswordMail(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+    public ResponseEntity<ApiResponse> sendConfirmationResetPasswordMail(@RequestBody ResetPasswordRequest resetPasswordRequest, HttpServletRequest request) {
         User user = userService.getUserByEmail(resetPasswordRequest.getEmail());
 
         if (user == null) {
@@ -100,7 +101,9 @@ public class AuthController {
 
         String token = createToken(user.getEmail());
 
-        String url = "http://localhost:9002/api/auth/sendResetPasswordMail/" + token;
+        String baseUrl = String.format("%s://%s:%d/api/auth/sendResetPasswordMail/", request.getScheme(),
+                request.getServerName(), request.getServerPort());
+        String url = baseUrl + token;
         String message = "Hello, this is from Edible. Please open this link and wait for another email if you want to confirm your password reset for your Edible account, here is the link: "
                          + url;
         userService.sendResetPasswordEmail(user.getEmail(), message);

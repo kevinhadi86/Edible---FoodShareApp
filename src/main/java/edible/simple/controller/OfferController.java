@@ -121,6 +121,25 @@ public class OfferController {
         return myOffers;
     }
 
+    @GetMapping("/user/{username}")
+    public List<BaseOfferResponse> getOfferByUser(@PathVariable String username) {
+        User user = userService.getUserByUsername(username);
+
+        List<Offer> offers = offerService.getOfferByUser(user);
+        List<BaseOfferResponse> myOffers = new ArrayList<>();
+
+        for (Offer offer : offers) {
+
+            BaseOfferResponse baseOfferResponse = new BaseOfferResponse();
+
+            fillBaseOfferResponse(baseOfferResponse, offer);
+
+            myOffers.add(baseOfferResponse);
+        }
+
+        return myOffers;
+    }
+
     @GetMapping("/all")
     public List<OtherUserOfferResponse> getAllOffer(@CurrentUser UserPrincipal userPrincipal) {
         User user = userService.getUserById(userPrincipal.getId());
