@@ -12,8 +12,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.NaturalId;
-
 /**
  * @author Kevin Hadinata
  * @version $Id: User.java, v 0.1 2019‐09‐11 11:59 Kevin Hadinata Exp $$
@@ -42,8 +40,10 @@ public class User extends DataAudit {
     @Size(max = 255)
     private String     bio;
     @Size(max = 30)
-    private String     phonenumber;
-    private String     imageurl;
+    @Column(name = "phone_number")
+    private String     phoneNumber;
+    @Column(name = "phone_number")
+    private String     imageUrl;
     private int        rating;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -53,18 +53,18 @@ public class User extends DataAudit {
     @OneToMany(mappedBy = "user")
     private Set<Offer> offers = new HashSet<>();
 
-    private String   city;
+    private String     city;
 
     public User() {
     }
 
-    public User(String name, String username, String email, String password, String phonenumber,
+    public User(String name, String username, String email, String password, String phoneNumber,
                 String city) {
         this.name = name;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.phonenumber = phonenumber;
+        this.phoneNumber = phoneNumber;
         this.city = city;
     }
 
@@ -116,20 +116,20 @@ public class User extends DataAudit {
         this.bio = bio;
     }
 
-    public String getImageurl() {
-        return imageurl;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImageurl(String imageurl) {
-        this.imageurl = imageurl;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public String getPhonenumber() {
-        return phonenumber;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhonenumber(String phonenumber) {
-        this.phonenumber = phonenumber;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public int getRating() {

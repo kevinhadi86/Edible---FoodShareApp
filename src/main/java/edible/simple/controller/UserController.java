@@ -4,8 +4,6 @@
  */
 package edible.simple.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,17 +12,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import edible.simple.model.Location;
 import edible.simple.model.User;
 import edible.simple.payload.ApiResponse;
 import edible.simple.payload.user.BaseUserResponse;
 import edible.simple.payload.user.UpdatePasswordUser;
 import edible.simple.payload.user.UpdateUserRequest;
-import edible.simple.payload.user.UserLocationRequest;
 import edible.simple.security.CurrentUser;
 import edible.simple.security.UserPrincipal;
 import edible.simple.service.CategoryService;
-import edible.simple.service.LocationService;
 import edible.simple.service.StorageService;
 import edible.simple.service.UserService;
 
@@ -67,6 +62,7 @@ public class UserController {
 
         BaseUserResponse currentUser = new BaseUserResponse();
         BeanUtils.copyProperties(user, currentUser);
+        currentUser.setPhoneNumber(user.getPhoneNumber());
 
         return currentUser;
     }
@@ -106,28 +102,21 @@ public class UserController {
                 HttpStatus.BAD_REQUEST);
         }
 
-        if (updateUserRequest.getId().equals(userPrincipal.getId())) {
+        user.setEmail(updateUserRequest.getEmail());
+        user.setUsername(updateUserRequest.getUsername());
+        user.setName(updateUserRequest.getName());
+        user.setPhoneNumber(updateUserRequest.getPhoneNumber());
+        user.setBio(updateUserRequest.getBio());
+        user.setImageUrl(updateUserRequest.getImageUrl());
 
-            user.setEmail(updateUserRequest.getEmail());
-            user.setUsername(updateUserRequest.getUsername());
-            user.setName(updateUserRequest.getName());
-            user.setPhonenumber(updateUserRequest.getPhoneNumber());
-            user.setBio(updateUserRequest.getBio());
-            user.setImageurl(updateUserRequest.getImageUrl());
+        user.setCity(updateUserRequest.getCity());
 
-            user.setCity(updateUserRequest.getCity());
+        if (userService.saveUser(user)) {
 
-            if (userService.saveUser(user)) {
-
-                return new ResponseEntity(new ApiResponse(true, "Update profile success"),
-                    HttpStatus.OK);
-            }
-            return new ResponseEntity(new ApiResponse(false, "failed update user"),
-                HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new ApiResponse(true, "Update profile success"),
+                HttpStatus.OK);
         }
-
-        return new ResponseEntity(
-            new ApiResponse(false, "failed update user because id is different"),
+        return new ResponseEntity(new ApiResponse(false, "failed update user"),
             HttpStatus.BAD_REQUEST);
     }
 }

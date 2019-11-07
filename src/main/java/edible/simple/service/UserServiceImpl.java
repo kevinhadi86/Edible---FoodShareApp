@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import edible.simple.model.Location;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -63,7 +62,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
 
         BeanUtils.copyProperties(saveNewUserRequest, user);
-        user.setPhonenumber(saveNewUserRequest.getPhoneNumber());
+        user.setPhoneNumber(saveNewUserRequest.getPhoneNumber());
 
         user.setCity(saveNewUserRequest.getCity());
 
