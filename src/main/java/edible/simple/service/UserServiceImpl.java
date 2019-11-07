@@ -62,7 +62,6 @@ public class UserServiceImpl implements UserService {
         User user = new User();
 
         BeanUtils.copyProperties(saveNewUserRequest, user);
-        user.setPhoneNumber(saveNewUserRequest.getPhoneNumber());
 
         user.setCity(saveNewUserRequest.getCity());
 
