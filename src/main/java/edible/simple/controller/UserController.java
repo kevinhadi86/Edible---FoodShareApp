@@ -62,7 +62,6 @@ public class UserController {
 
         BaseUserResponse currentUser = new BaseUserResponse();
         BeanUtils.copyProperties(user, currentUser);
-        currentUser.setPhoneNumber(user.getPhoneNumber());
 
         return currentUser;
     }

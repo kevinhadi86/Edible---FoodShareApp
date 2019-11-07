@@ -42,7 +42,7 @@ public class User extends DataAudit {
     @Size(max = 30)
     @Column(name = "phone_number")
     private String     phoneNumber;
-    @Column(name = "phone_number")
+    @Column(name = "image_url")
     private String     imageUrl;
     private int        rating;
 
