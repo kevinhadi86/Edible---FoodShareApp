@@ -6,11 +6,13 @@ package edible.simple.controller;
 
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import edible.simple.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +63,10 @@ public class AuthController {
     JavaMailSender        javaMailSender;
 
     @Autowired
-    LocationService locationService;
+    LocationService       locationService;
+
+    @Autowired
+    CategoryService       categoryService;
 
     @GetMapping("/HelloWorld")
     public ResponseEntity<ApiResponse> helloWorld() {
@@ -91,7 +96,8 @@ public class AuthController {
     }
 
     @PostMapping("/sendConfirmationResetPasswordMail")
-    public ResponseEntity<ApiResponse> sendConfirmationResetPasswordMail(@RequestBody ResetPasswordRequest resetPasswordRequest, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse> sendConfirmationResetPasswordMail(@RequestBody ResetPasswordRequest resetPasswordRequest,
+                                                                         HttpServletRequest request) {
         User user = userService.getUserByEmail(resetPasswordRequest.getEmail());
 
         if (user == null) {
@@ -101,8 +107,8 @@ public class AuthController {
 
         String token = createToken(user.getEmail());
 
-        String baseUrl = String.format("%s://%s:%d/api/auth/sendResetPasswordMail/", request.getScheme(),
-                request.getServerName(), request.getServerPort());
+        String baseUrl = String.format("%s://%s:%d/api/auth/sendResetPasswordMail/",
+            request.getScheme(), request.getServerName(), request.getServerPort());
         String url = baseUrl + token;
         String message = "Hello, this is from Edible. Please open this link and wait for another email if you want to confirm your password reset for your Edible account, here is the link: "
                          + url;
@@ -143,12 +149,12 @@ public class AuthController {
     }
 
     @GetMapping("/getProvince")
-    public Set<String> getAllProvince(){
+    public Set<String> getAllProvince() {
         return locationService.getAllProvince();
     }
 
     @GetMapping("/getCity/{province}")
-    public Set<String> getCityByProvince(@PathVariable String province){
+    public Set<String> getCityByProvince(@PathVariable String province) {
         return locationService.getCityByProvince(province);
     }
 
@@ -158,6 +164,11 @@ public class AuthController {
         String nowMiliseconds = Long.toString(now.getTime());
 
         return Base64.getEncoder().encodeToString((email + "%%" + nowMiliseconds).getBytes());
+    }
+
+    @GetMapping("/getCategory")
+    public List<String> getAllCategories() {
+        return categoryService.getAllCategories();
     }
 
     private String getEmailFromToken(String token) {

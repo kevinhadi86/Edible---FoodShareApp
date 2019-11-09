@@ -1,6 +1,6 @@
 package edible.simple.payload.user;
 
-import edible.simple.model.Location;
+import java.util.List;
 
 import javax.validation.constraints.Email;
 
@@ -15,6 +15,7 @@ public class BaseUserResponse {
     private String bio;
     private int rating;
     private String city;
+    private List<String> preferences;
 
     public BaseUserResponse() {
     }
@@ -91,4 +92,11 @@ public class BaseUserResponse {
         this.city = city;
     }
 
+    public List<String> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(List<String> preferences) {
+        this.preferences = preferences;
+    }
 }

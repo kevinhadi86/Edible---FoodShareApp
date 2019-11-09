@@ -4,6 +4,12 @@
  */
 package edible.simple.controller;
 
+import edible.simple.model.Category;
+import edible.simple.model.Review;
+import edible.simple.model.dataEnum.CategoryName;
+import edible.simple.payload.review.ReviewResponse;
+import edible.simple.payload.user.OtherUserResponse;
+import edible.simple.service.ReviewService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +28,11 @@ import edible.simple.security.UserPrincipal;
 import edible.simple.service.CategoryService;
 import edible.simple.service.StorageService;
 import edible.simple.service.UserService;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Kevin Hadinata
@@ -43,6 +54,9 @@ public class UserController {
     @Autowired
     StorageService  storageService;
 
+    @Autowired
+    ReviewService   reviewService;
+
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public BaseUserResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
@@ -52,16 +66,32 @@ public class UserController {
         BaseUserResponse currentUser = new BaseUserResponse();
         BeanUtils.copyProperties(user, currentUser);
 
+        List<String> preferences = new ArrayList<>();
+        for (Category category : user.getCategories()){
+            preferences.add(category.getCategoryName().toString());
+        }
+        currentUser.setPreferences(preferences);
+
         return currentUser;
     }
 
     @GetMapping("/other/{username}")
-    public BaseUserResponse getOtherUser(@PathVariable String username) {
+    public OtherUserResponse getOtherUser(@PathVariable String username) {
 
         User user = userService.getUserByUsername(username);
 
-        BaseUserResponse currentUser = new BaseUserResponse();
+        OtherUserResponse currentUser = new OtherUserResponse();
         BeanUtils.copyProperties(user, currentUser);
+
+        List<ReviewResponse> reviewResponses = new ArrayList<>();
+        List<Review> userReviews = reviewService.getReviewByUser(user);
+        for (Review review : userReviews){
+            ReviewResponse reviewResponse = new ReviewResponse();
+            BeanUtils.copyProperties(review,reviewResponse);
+
+            reviewResponses.add(reviewResponse);
+        }
+        currentUser.setReviewResponse(reviewResponses);
 
         return currentUser;
     }
@@ -109,6 +139,14 @@ public class UserController {
         user.setImageUrl(updateUserRequest.getImageUrl());
 
         user.setCity(updateUserRequest.getCity());
+
+        Set<Category> categories = new HashSet<>();
+        for (String category : updateUserRequest.getPreferences()){
+            CategoryName categoryName = CategoryName.getByCode(category);
+            Category category1 = categoryService.getCategoryByName(categoryName);
+            categories.add(category1);
+        }
+        user.setCategories(categories);
 
         if (userService.saveUser(user)) {
 

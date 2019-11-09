@@ -5,6 +5,7 @@
 package edible.simple.payload.user;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * @author Kevin Hadinata
@@ -18,6 +19,8 @@ public class UpdateUserRequest extends SaveUserRequest {
     private String imageUrl;
 
     private String bio;
+
+    private List<String> preferences;
 
     public Long getId() {
         return id;
@@ -41,5 +44,13 @@ public class UpdateUserRequest extends SaveUserRequest {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public List<String> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(List<String> preferences) {
+        this.preferences = preferences;
     }
 }

@@ -55,6 +55,10 @@ public class User extends DataAudit {
 
     private String     city;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_preferences", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category>  categories  = new HashSet<>();
+
     public User() {
     }
 
@@ -162,5 +166,13 @@ public class User extends DataAudit {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
     }
 }

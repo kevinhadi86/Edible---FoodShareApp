@@ -8,7 +8,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import edible.simple.payload.SearchResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,11 +51,9 @@ public class OfferController {
     StorageService  storageService;
 
     @GetMapping("/search/{search}")
-    public SearchResponse search(@PathVariable String search) {
+    public List<BaseOfferResponse> search(@PathVariable String search) {
 
-        SearchResponse searchResponse = new SearchResponse();
         List<BaseOfferResponse> baseOfferResponseList = new ArrayList<>();
-        List<BaseUserResponse> baseUserResponseList = new ArrayList<>();
 
         List<Offer> offersByTitle = offerService.getOfferByTitle(search);
         if(!offersByTitle.isEmpty()){
@@ -76,19 +73,7 @@ public class OfferController {
             }
         }
 
-        List<User> users = userService.getAllUserByUsername(search);
-        if(!users.isEmpty()){
-            for (User user : users){
-                BaseUserResponse userResponse = new BaseUserResponse();
-                BeanUtils.copyProperties(user, userResponse);
-                baseUserResponseList.add(userResponse);
-            }
-        }
-
-        searchResponse.setBaseOfferResponseList(baseOfferResponseList);
-        searchResponse.setBaseUserResponseList(baseUserResponseList);
-
-        return searchResponse;
+        return baseOfferResponseList;
     }
 
     @GetMapping("/{id}")
@@ -145,6 +130,34 @@ public class OfferController {
         User user = userService.getUserById(userPrincipal.getId());
 
         List<Offer> offers = offerService.getAllOffer();
+        List<OtherUserOfferResponse> allOffer = new ArrayList<>();
+
+        for (Offer offer : offers) {
+
+            if (offer.getUser().getId() != user.getId()) {
+
+                OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
+
+                fillOtherUserOfferResponse(otherUserOfferResponse, offer);
+
+                allOffer.add(otherUserOfferResponse);
+            }
+        }
+
+        return allOffer;
+    }
+
+    @GetMapping("/myPreferences")
+    public List<OtherUserOfferResponse> getAllOfferByMyPreferences(@CurrentUser UserPrincipal userPrincipal) {
+        User user = userService.getUserById(userPrincipal.getId());
+
+        List<Offer> offers = new ArrayList<>();
+
+        for (Category category : user.getCategories()){
+            List<Offer> eachOffer = offerService.getOfferByCategory(category);
+            offers.addAll(eachOffer);
+        }
+
         List<OtherUserOfferResponse> allOffer = new ArrayList<>();
 
         for (Offer offer : offers) {
@@ -289,7 +302,13 @@ public class OfferController {
             imageUrls.add(offerImage.getUrl());
         }
         baseOfferResponse.setImageUrls(imageUrls);
-        baseOfferResponse.setCreatedTime(String.valueOf(offer.getCreatedAt()));
+        Date createdDate = new Date();
+        try {
+            createdDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(String.valueOf(offer.getCreatedAt()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        baseOfferResponse.setCreatedTime(new SimpleDateFormat("dd MMM yyyy").format(createdDate));
         if (offer.isCod()) {
             baseOfferResponse.setCod(true);
             baseOfferResponse.setCodDescription(offer.getCodDescription());

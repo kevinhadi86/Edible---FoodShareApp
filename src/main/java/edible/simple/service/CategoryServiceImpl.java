@@ -4,6 +4,8 @@
  */
 package edible.simple.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +35,18 @@ public class CategoryServiceImpl implements CategoryService {
             return category.get();
         }
         return null;
+    }
+
+    @Override
+    public List<String> getAllCategories() {
+
+        List<Category> categories = categoryRepository.findAll();
+
+        List<String> categoryName = new ArrayList<>();
+        for (Category category : categories){
+            categoryName.add(category.getCategoryName().toString());
+        }
+
+        return categoryName;
     }
 }

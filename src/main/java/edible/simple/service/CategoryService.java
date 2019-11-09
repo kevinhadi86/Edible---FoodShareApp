@@ -7,6 +7,8 @@ package edible.simple.service;
 import edible.simple.model.Category;
 import edible.simple.model.dataEnum.CategoryName;
 
+import java.util.List;
+
 /**
  * @author Kevin Hadinata
  * @version $Id: CategoryService.java, v 0.1 2019‐09‐17 19:22 Kevin Hadinata Exp $$
@@ -14,5 +16,7 @@ import edible.simple.model.dataEnum.CategoryName;
 public interface CategoryService {
 
     public Category getCategoryByName(CategoryName name);
+
+    public List<String> getAllCategories();
 
 }
