@@ -8,7 +8,7 @@ import edible.simple.model.Category;
 import edible.simple.model.Review;
 import edible.simple.model.dataEnum.CategoryName;
 import edible.simple.payload.review.ReviewResponse;
-import edible.simple.payload.user.OtherUserResponse;
+import edible.simple.payload.user.*;
 import edible.simple.service.ReviewService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import edible.simple.model.User;
 import edible.simple.payload.ApiResponse;
-import edible.simple.payload.user.BaseUserResponse;
-import edible.simple.payload.user.UpdatePasswordUser;
-import edible.simple.payload.user.UpdateUserRequest;
 import edible.simple.security.CurrentUser;
 import edible.simple.security.UserPrincipal;
 import edible.simple.service.CategoryService;
@@ -66,11 +63,14 @@ public class UserController {
         BaseUserResponse currentUser = new BaseUserResponse();
         BeanUtils.copyProperties(user, currentUser);
 
-        List<String> preferences = new ArrayList<>();
-        for (Category category : user.getCategories()){
-            preferences.add(category.getCategoryName().toString());
+        if (!user.getCategories().isEmpty()) {
+
+            List<String> preferences = new ArrayList<>();
+            for (Category category : user.getCategories()) {
+                preferences.add(category.getCategoryName().toString());
+            }
+            currentUser.setPreferences(preferences);
         }
-        currentUser.setPreferences(preferences);
 
         return currentUser;
     }
@@ -85,9 +85,9 @@ public class UserController {
 
         List<ReviewResponse> reviewResponses = new ArrayList<>();
         List<Review> userReviews = reviewService.getReviewByUser(user);
-        for (Review review : userReviews){
+        for (Review review : userReviews) {
             ReviewResponse reviewResponse = new ReviewResponse();
-            BeanUtils.copyProperties(review,reviewResponse);
+            BeanUtils.copyProperties(review, reviewResponse);
 
             reviewResponses.add(reviewResponse);
         }
@@ -140,8 +140,23 @@ public class UserController {
 
         user.setCity(updateUserRequest.getCity());
 
+        if (userService.saveUser(user)) {
+
+            return new ResponseEntity(new ApiResponse(true, "Update profile success"),
+                HttpStatus.OK);
+        }
+        return new ResponseEntity(new ApiResponse(false, "failed update user"),
+            HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/me/update/preferences")
+    public ResponseEntity<ApiResponse> updateUserPreferences(@CurrentUser UserPrincipal userPrincipal,
+                                                             @RequestBody UpdatePreferencesUserRequest updateUserRequest) {
+
+        User user = userService.getUserByEmail(userPrincipal.getEmail());
+
         Set<Category> categories = new HashSet<>();
-        for (String category : updateUserRequest.getPreferences()){
+        for (String category : updateUserRequest.getPreferences()) {
             CategoryName categoryName = CategoryName.getByCode(category);
             Category category1 = categoryService.getCategoryByName(categoryName);
             categories.add(category1);
