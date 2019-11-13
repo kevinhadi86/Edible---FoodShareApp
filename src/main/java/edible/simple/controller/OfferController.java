@@ -58,18 +58,24 @@ public class OfferController {
         List<Offer> offersByTitle = offerService.getOfferByTitle(search);
         if(!offersByTitle.isEmpty()){
             for (Offer offer : offersByTitle){
-                BaseOfferResponse offerByTitle = new BaseOfferResponse();
-                fillBaseOfferResponse(offerByTitle,offer);
-                baseOfferResponseList.add(offerByTitle);
+                if(offer.getQuantity()>0){
+                    BaseOfferResponse offerByTitle = new BaseOfferResponse();
+                    fillBaseOfferResponse(offerByTitle,offer);
+                    baseOfferResponseList.add(offerByTitle);
+
+                }
             }
         }
 
         List<Offer> offersByDescription = offerService.getOfferByDescription(search);
         if(!offersByDescription.isEmpty()){
             for (Offer offer : offersByDescription){
-                BaseOfferResponse offerByDescription = new BaseOfferResponse();
-                fillBaseOfferResponse(offerByDescription,offer);
-                baseOfferResponseList.add(offerByDescription);
+                if(offer.getQuantity()>0){
+                    BaseOfferResponse offerByDescription = new BaseOfferResponse();
+                    fillBaseOfferResponse(offerByDescription,offer);
+                    baseOfferResponseList.add(offerByDescription);
+
+                }
             }
         }
 
@@ -134,7 +140,7 @@ public class OfferController {
 
         for (Offer offer : offers) {
 
-            if (offer.getUser().getId() != user.getId()) {
+            if (offer.getUser().getId() != user.getId() && offer.getQuantity()>0) {
 
                 OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
 
@@ -185,12 +191,14 @@ public class OfferController {
         List<OtherUserOfferResponse> offersByCategory = new ArrayList<>();
 
         for (Offer offer : offers) {
+            if(offer.getQuantity()>0){
 
-            OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
+                OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
 
-            fillOtherUserOfferResponse(otherUserOfferResponse, offer);
+                fillOtherUserOfferResponse(otherUserOfferResponse, offer);
 
-            offersByCategory.add(otherUserOfferResponse);
+                offersByCategory.add(otherUserOfferResponse);
+            }
         }
 
         return offersByCategory;
@@ -302,13 +310,11 @@ public class OfferController {
             imageUrls.add(offerImage.getUrl());
         }
         baseOfferResponse.setImageUrls(imageUrls);
-        Date createdDate = new Date();
-        try {
-            createdDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(String.valueOf(offer.getCreatedAt()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        baseOfferResponse.setCreatedTime(new SimpleDateFormat("dd MMM yyyy").format(createdDate));
+
+        Date createdDate = Date.from(offer.getCreatedAt());
+        String formattedDate = new SimpleDateFormat("dd MMM yyyy").format(createdDate);
+        baseOfferResponse.setCreatedTime(formattedDate);
+
         if (offer.isCod()) {
             baseOfferResponse.setCod(true);
             baseOfferResponse.setCodDescription(offer.getCodDescription());

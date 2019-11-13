@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "reviews")
-public class Review {
+public class Review extends DataAudit{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

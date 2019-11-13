@@ -16,6 +16,7 @@ public class ReviewResponse {
     private TransactionResponse transaction;
     private Float rating;
     private String review;
+    private String date;
 
     public Long getId() {
         return id;
@@ -47,5 +48,13 @@ public class ReviewResponse {
 
     public void setReview(String review) {
         this.review = review;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

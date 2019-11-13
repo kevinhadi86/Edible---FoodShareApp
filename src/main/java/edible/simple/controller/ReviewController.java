@@ -4,7 +4,11 @@
  */
 package edible.simple.controller;
 
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -92,6 +96,10 @@ public class ReviewController {
             reviewResponse.setId(review.getId());
             reviewResponse.setRating(review.getRating());
             reviewResponse.setReview(review.getReview());
+
+            Date createdDate = Date.from(review.getCreatedAt());
+            String formattedDate = new SimpleDateFormat("dd MMM yyyy").format(createdDate);
+            reviewResponse.setDate(formattedDate);
 
             TransactionResponse transactionResponse = new TransactionResponse();
             BeanUtils.copyProperties(review.getTransaction(), transactionResponse);
