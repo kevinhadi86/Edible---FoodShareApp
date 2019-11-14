@@ -281,7 +281,7 @@ public class TransactionController {
         logger
             .info("Failed when save transaction data when checking the take transaction, "
                   + request.getQuantity() + "," + (offer.getQuantity() - request.getQuantity() >= 0)
-                  + "," + (offer.getExpiryDate().compareTo(now) < 0));
+                  + "," + offer.getExpiryDate() +"-,-"+now);
         return false;
     }
 
