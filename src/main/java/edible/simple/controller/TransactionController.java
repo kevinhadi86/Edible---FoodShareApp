@@ -132,11 +132,9 @@ public class TransactionController {
     public ResponseEntity<ApiResponse> addTransaction(@CurrentUser UserPrincipal userPrincipal,
                                                       @RequestBody AddTransactionRequest request) {
 
-
         Offer offer = offerService.getOfferById(request.getOffer_id());
         boolean userCheck = userPrincipal.getId() != offer.getUser().getId();
-        if (userCheck && offer != null
-            && checkTakeTransaction(request, offer)) {
+        if (userCheck && offer != null && checkTakeTransaction(request, offer)) {
 
             Transaction transaction = new Transaction();
             transaction.setUser(userService.getUserById(userPrincipal.getId()));
@@ -148,9 +146,10 @@ public class TransactionController {
 
             Date pickupTime = new Date();
             try {
-                pickupTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(request.getPickupTime());
+                pickupTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+                    .parse(request.getPickupTime());
             } catch (ParseException e) {
-                logger.info("Failed when save transaction data, because: "+e);
+                logger.info("Failed when save transaction data, because: " + e);
             }
             transaction.setPickupTime(pickupTime);
 
@@ -159,12 +158,13 @@ public class TransactionController {
 
                 return new ResponseEntity(new ApiResponse(true, "Success add transaction"),
                     HttpStatus.OK);
-            }else{
+            } else {
                 logger.info("Failed when save transaction data");
             }
 
         }
-        logger.info("Failed when save transaction data because checking, userCheck:"+userCheck+"offer: "+offer.toString());
+        logger.info("Failed when save transaction data because checking, userCheck:" + userCheck
+                    + "offer: " + offer.toString());
         return new ResponseEntity(new ApiResponse(false, "Failed add transaction"),
             HttpStatus.BAD_REQUEST);
     }
@@ -278,7 +278,10 @@ public class TransactionController {
             && offer.getExpiryDate().compareTo(now) < 0) {
             return true;
         }
-        logger.info("Failed when save transaction data when checking the take transaction");
+        logger
+            .info("Failed when save transaction data when checking the take transaction, "
+                  + request.getQuantity() + "," + (offer.getQuantity() - request.getQuantity() >= 0)
+                  + "," + (offer.getExpiryDate().compareTo(now) < 0));
         return false;
     }
 
