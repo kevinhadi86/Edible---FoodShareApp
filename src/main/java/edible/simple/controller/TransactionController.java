@@ -10,15 +10,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import edible.simple.model.*;
+import edible.simple.model.Offer;
+import edible.simple.model.OfferImage;
+import edible.simple.model.Transaction;
+import edible.simple.model.User;
 import edible.simple.model.dataEnum.StatusEnum;
-import edible.simple.model.dataEnum.UnitName;
 import edible.simple.payload.ApiResponse;
 import edible.simple.payload.offer.OtherUserOfferResponse;
 import edible.simple.payload.transcation.AddTransactionRequest;
@@ -125,6 +129,8 @@ public class TransactionController {
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addTransaction(@CurrentUser UserPrincipal userPrincipal,
                                                       @RequestBody AddTransactionRequest request) {
+        Logger logger = LoggerFactory.getLogger(TransactionController.class);
+
         Offer offer = offerService.getOfferById(request.getOffer_id());
         if (userPrincipal.getId() != offer.getUser().getId() && offer != null
             && checkTakeTransaction(request, offer)) {
@@ -141,15 +147,21 @@ public class TransactionController {
             try {
                 pickupTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(request.getPickupTime());
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.info("Failed when save transaction data, because: "+e);
             }
             transaction.setPickupTime(pickupTime);
 
             if (transactionService.saveTransaction(transaction) != null) {
+                logger.info("Success when save transaction data");
+
                 return new ResponseEntity(new ApiResponse(true, "Success add transaction"),
                     HttpStatus.OK);
+            }else{
+                logger.info("Failed when save transaction data");
             }
+
         }
+        logger.info("Failed when save transaction data before checking");
         return new ResponseEntity(new ApiResponse(false, "Failed add transaction"),
             HttpStatus.BAD_REQUEST);
     }
