@@ -133,7 +133,6 @@ public class TransactionController {
             transaction.setUser(userService.getUserById(userPrincipal.getId()));
             transaction.setOffer(offer);
             transaction.setQuantity(request.getQuantity());
-            transaction.setUnit(offer.getUnit());
 
             transaction.setStatus(StatusEnum.INIT);
 
