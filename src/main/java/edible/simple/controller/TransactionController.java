@@ -260,7 +260,7 @@ public class TransactionController {
 
     private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
         Date now = new Date();
-        if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() > 0
+        if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() >= 0
             && offer.getExpiryDate().compareTo(now) < 0) {
             return true;
         }
