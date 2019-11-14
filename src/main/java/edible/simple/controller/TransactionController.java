@@ -264,7 +264,7 @@ public class TransactionController {
             logger.info("Failed when save transaction data, because: " + e);
         }
         if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() >= 0
-            && expiryDate.compareTo(now) < 0) {
+            && expiryDate.after(now)) {
             return true;
         }
         logger
