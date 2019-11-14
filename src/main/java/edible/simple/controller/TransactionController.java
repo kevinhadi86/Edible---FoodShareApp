@@ -139,7 +139,7 @@ public class TransactionController {
 
             Date pickupTime = new Date();
             try {
-                pickupTime = new SimpleDateFormat("HH:mm").parse(request.getPickupTime());
+                pickupTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(request.getPickupTime());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
