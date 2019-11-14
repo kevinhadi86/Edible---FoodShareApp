@@ -233,24 +233,6 @@ public class TransactionController {
             HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/ongoing")
-    public ResponseEntity<ApiResponse> updateTranscationToOngoing(@CurrentUser UserPrincipal userPrincipal,
-                                                                  @RequestBody UpdateTransactionStatusRequest request) {
-        Transaction transaction = transactionService.getTransactionById(request.getId());
-        if (transaction != null && transaction.getStatus() != StatusEnum.DONE
-            && transaction.getOffer().getUser().getId() == userPrincipal.getId()) {
-
-            transaction.setStatus(StatusEnum.ONGOING);
-
-            if (transactionService.saveTransaction(transaction) != null) {
-                return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
-                    HttpStatus.OK);
-            }
-        }
-        return new ResponseEntity<>(new ApiResponse(false, "Failed save transaction"),
-            HttpStatus.BAD_REQUEST);
-    }
-
     private void fillOfferResponse(OtherUserOfferResponse otherUserOfferResponse,
                                    Transaction transaction) {
 
@@ -274,7 +256,7 @@ public class TransactionController {
 
     private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
         Date now = new Date();
-        Date expiryDate = new SimpleDateFormat("yyyy-MM-dd").parse(offer.getExpiryDate(););
+        Date expiryDate = new SimpleDateFormat("yyyy-MM-dd").parse(offer.getExpiryDate());
         if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() >= 0
             && expiryDate.compareTo(now) < 0) {
             return true;
