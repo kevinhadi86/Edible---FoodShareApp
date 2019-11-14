@@ -256,7 +256,13 @@ public class TransactionController {
 
     private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
         Date now = new Date();
-        Date expiryDate = new SimpleDateFormat("yyyy-MM-dd").parse(offer.getExpiryDate());
+        String convertDate = new SimpleDateFormat("yyyy-MM-dd").format(offer.getExpiryDate());
+        Date expiryDate = null;
+        try {
+            expiryDate = new SimpleDateFormat("yyyy-MM-dd").parse(convertDate);
+        } catch (ParseException e) {
+            logger.info("Failed when save transaction data, because: " + e);
+        }
         if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() >= 0
             && expiryDate.compareTo(now) < 0) {
             return true;
