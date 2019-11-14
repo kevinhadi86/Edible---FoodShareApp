@@ -274,8 +274,9 @@ public class TransactionController {
 
     private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
         Date now = new Date();
+        Date expiryDate = new SimpleDateFormat("yyyy-MM-dd").parse(offer.getExpiryDate(););
         if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() >= 0
-            && offer.getExpiryDate().compareTo(now) < 0) {
+            && expiryDate.compareTo(now) < 0) {
             return true;
         }
         logger
