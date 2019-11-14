@@ -56,6 +56,8 @@ public class TransactionController {
     @Autowired
     UnitService        unitService;
 
+    static Logger      logger = LoggerFactory.getLogger(TransactionController.class);
+
     @GetMapping("/myTransaction/take")
     public List<TransactionResponse> getMyTransactionAsTaker(@CurrentUser UserPrincipal userPrincipal) {
 
@@ -100,15 +102,15 @@ public class TransactionController {
 
         for (Transaction transaction : transactions) {
 
-            if(transaction.getOffer().getUser().equals(user)) {
+            if (transaction.getOffer().getUser().equals(user)) {
                 TransactionResponse transactionResponse = new TransactionResponse();
 
                 transactionResponse.setId(transaction.getId());
                 transactionResponse.setStatus(transaction.getStatus().name());
                 transactionResponse.setUnit(transaction.getUnit().getUnitName().name());
                 transactionResponse.setQuantity(transaction.getQuantity());
-                transactionResponse
-                        .setPickupTime(new SimpleDateFormat("HH:mm").format(transaction.getPickupTime()));
+                transactionResponse.setPickupTime(
+                    new SimpleDateFormat("HH:mm").format(transaction.getPickupTime()));
 
                 BaseUserResponse userResponse = new BaseUserResponse();
                 BeanUtils.copyProperties(transaction.getUser(), userResponse);
@@ -129,10 +131,11 @@ public class TransactionController {
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addTransaction(@CurrentUser UserPrincipal userPrincipal,
                                                       @RequestBody AddTransactionRequest request) {
-        Logger logger = LoggerFactory.getLogger(TransactionController.class);
+
 
         Offer offer = offerService.getOfferById(request.getOffer_id());
-        if (userPrincipal.getId() != offer.getUser().getId() && offer != null
+        boolean userCheck = userPrincipal.getId() != offer.getUser().getId();
+        if (userCheck && offer != null
             && checkTakeTransaction(request, offer)) {
 
             Transaction transaction = new Transaction();
@@ -161,7 +164,7 @@ public class TransactionController {
             }
 
         }
-        logger.info("Failed when save transaction data before checking");
+        logger.info("Failed when save transaction data because checking, userCheck:"+userCheck+"offer: "+offer.toString());
         return new ResponseEntity(new ApiResponse(false, "Failed add transaction"),
             HttpStatus.BAD_REQUEST);
     }
@@ -266,8 +269,7 @@ public class TransactionController {
         BeanUtils.copyProperties(transaction.getOffer().getUser(), baseUserResponse);
         otherUserOfferResponse.setUser(baseUserResponse);
 
-        otherUserOfferResponse
-            .setLocation(transaction.getOffer().getUser().getCity());
+        otherUserOfferResponse.setLocation(transaction.getOffer().getUser().getCity());
     }
 
     private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
@@ -276,6 +278,7 @@ public class TransactionController {
             && offer.getExpiryDate().compareTo(now) < 0) {
             return true;
         }
+        logger.info("Failed when save transaction data when checking the take transaction");
         return false;
     }
 
