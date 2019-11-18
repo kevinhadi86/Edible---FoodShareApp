@@ -175,7 +175,7 @@ public class ReviewController {
                     HttpStatus.OK);
             }
         }
-        logger"gagal checking"
+        logger.info("gagal checking");
         return new ResponseEntity<>(new ApiResponse(false, "Failed add review"),
             HttpStatus.BAD_REQUEST);
     }
