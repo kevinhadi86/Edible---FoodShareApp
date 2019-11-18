@@ -25,6 +25,7 @@ public class BaseOfferResponse {
     private String       codDescription;
     private boolean      isDelivery;
     private String       deliveryDescription;
+    private String       city;
 
     public Long getId() {
         return id;
@@ -128,5 +129,13 @@ public class BaseOfferResponse {
 
     public void setDeliveryDescription(String deliveryDescription) {
         this.deliveryDescription = deliveryDescription;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

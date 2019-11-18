@@ -323,6 +323,8 @@ public class OfferController {
             baseOfferResponse.setDelivery(true);
             baseOfferResponse.setDeliveryDescription(offer.getDeliveryDescription());
         }
+
+        baseOfferResponse.setCity(offer.getUser().getCity());
     }
 
     private void fillOtherUserOfferResponse(OtherUserOfferResponse otherUserOfferResponse,
