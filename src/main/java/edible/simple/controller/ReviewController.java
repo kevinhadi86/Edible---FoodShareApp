@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,8 @@ public class ReviewController {
     @Autowired
     TransactionService transactionService;
 
+    static Logger      logger = LoggerFactory.getLogger(ReviewController.class);
+
     @GetMapping("/transaction/{id}")
     public ReviewResponse getReviewByTransaction(@CurrentUser UserPrincipal userPrincipal,
                                                  @PathVariable String id) {
@@ -67,13 +71,14 @@ public class ReviewController {
             BeanUtils.copyProperties(review.getTransaction(), transactionResponse);
 
             BaseUserResponse baseUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(review.getTransaction().getUser(),baseUserResponse);
+            BeanUtils.copyProperties(review.getTransaction().getUser(), baseUserResponse);
             transactionResponse.setUser(baseUserResponse);
 
             OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
             BeanUtils.copyProperties(review.getTransaction().getOffer(), otherUserOfferResponse);
             BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),baseOfferUserResponse);
+            BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),
+                baseOfferUserResponse);
             otherUserOfferResponse.setUser(baseOfferUserResponse);
             transactionResponse.setOffer(otherUserOfferResponse);
 
@@ -105,13 +110,14 @@ public class ReviewController {
             BeanUtils.copyProperties(review.getTransaction(), transactionResponse);
 
             BaseUserResponse baseUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(review.getTransaction().getUser(),baseUserResponse);
+            BeanUtils.copyProperties(review.getTransaction().getUser(), baseUserResponse);
             transactionResponse.setUser(baseUserResponse);
 
             OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
             BeanUtils.copyProperties(review.getTransaction().getOffer(), otherUserOfferResponse);
             BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),baseOfferUserResponse);
+            BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),
+                baseOfferUserResponse);
             otherUserOfferResponse.setUser(baseOfferUserResponse);
             transactionResponse.setOffer(otherUserOfferResponse);
 
@@ -129,14 +135,19 @@ public class ReviewController {
         Transaction transaction = transactionService
             .getTransactionById(addReviewRequest.getTransactionId());
 
+        logger.info("transaction: "+transaction.toString());
+
         User user = userService.getUserById(userPrincipal.getId());
 
         Review currentReview = reviewService.getReviewByTransaction(transaction);
-        if(currentReview.equals(null)){
-            return new ResponseEntity(new ApiResponse(false, "Review already done before"), HttpStatus.BAD_REQUEST);
+        if (currentReview.equals(null)) {
+            logger.info("revienwya udah ada");
+            return new ResponseEntity(new ApiResponse(false, "Review already done before"),
+                HttpStatus.BAD_REQUEST);
         }
 
         if (transaction != null && transaction.getUser() == user) {
+            logger.info("start generate review");
             Review review = new Review();
             review.setRating(addReviewRequest.getRating());
             review.setReview(addReviewRequest.getReview());
@@ -144,24 +155,27 @@ public class ReviewController {
 
             if (reviewService.addReview(review) != null) {
 
+                logger.info("udah berhasil save review");
                 int rating = 0;
                 int count = 0;
 
                 List<Review> reviews = reviewService.getReviewByUser(user);
 
-                for (Review allReview : reviews){
+                for (Review allReview : reviews) {
                     rating += allReview.getRating();
-                    count ++;
+                    count++;
                 }
 
-                user.setRating(rating/count);
+                user.setRating(rating / count);
 
                 userService.saveUser(user);
 
+                logger.info("udah berhasil save di usernya");
                 return new ResponseEntity<>(new ApiResponse(true, "Success add review"),
                     HttpStatus.OK);
             }
         }
+        logger"gagal checking"
         return new ResponseEntity<>(new ApiResponse(false, "Failed add review"),
             HttpStatus.BAD_REQUEST);
     }
