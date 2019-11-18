@@ -140,7 +140,7 @@ public class ReviewController {
         User user = userService.getUserById(userPrincipal.getId());
 
         Review currentReview = reviewService.getReviewByTransaction(transaction);
-        if (currentReview.equals(null)) {
+        if (currentReview.toString().equals(null)) {
             logger.info("revienwya udah ada");
             return new ResponseEntity(new ApiResponse(false, "Review already done before"),
                 HttpStatus.BAD_REQUEST);
