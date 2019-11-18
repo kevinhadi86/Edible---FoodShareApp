@@ -51,16 +51,16 @@ public class OfferController {
     StorageService  storageService;
 
     @GetMapping("/search/{search}")
-    public List<BaseOfferResponse> search(@PathVariable String search) {
+    public List<OtherUserOfferResponse> search(@PathVariable String search) {
 
-        List<BaseOfferResponse> baseOfferResponseList = new ArrayList<>();
+        List<OtherUserOfferResponse> baseOfferResponseList = new ArrayList<>();
 
         List<Offer> offersByTitle = offerService.getOfferByTitle(search);
         if(!offersByTitle.isEmpty()){
             for (Offer offer : offersByTitle){
                 if(offer.getQuantity()>0){
-                    BaseOfferResponse offerByTitle = new BaseOfferResponse();
-                    fillBaseOfferResponse(offerByTitle,offer);
+                    OtherUserOfferResponse offerByTitle = new OtherUserOfferResponse();
+                    fillOtherUserOfferResponse(offerByTitle,offer);
                     baseOfferResponseList.add(offerByTitle);
 
                 }
@@ -71,8 +71,8 @@ public class OfferController {
         if(!offersByDescription.isEmpty()){
             for (Offer offer : offersByDescription){
                 if(offer.getQuantity()>0){
-                    BaseOfferResponse offerByDescription = new BaseOfferResponse();
-                    fillBaseOfferResponse(offerByDescription,offer);
+                    OtherUserOfferResponse offerByDescription = new OtherUserOfferResponse();
+                    fillOtherUserOfferResponse(offerByDescription,offer);
                     baseOfferResponseList.add(offerByDescription);
 
                 }
@@ -324,7 +324,6 @@ public class OfferController {
             baseOfferResponse.setDeliveryDescription(offer.getDeliveryDescription());
         }
 
-        baseOfferResponse.setCity(offer.getUser().getCity());
     }
 
     private void fillOtherUserOfferResponse(OtherUserOfferResponse otherUserOfferResponse,
