@@ -135,6 +135,14 @@ public class ReviewController {
         Transaction transaction = transactionService
             .getTransactionById(addReviewRequest.getTransactionId());
 
+        if(transaction==null){
+            return new ResponseEntity<>(new ApiResponse(false, "Transaction not exists"),
+                    HttpStatus.BAD_REQUEST);
+        }else if(!transaction.getStatus().equals("DONE")){
+            return new ResponseEntity<>(new ApiResponse(false, "Transaction not Done"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
         logger.info("transaction: "+transaction.toString());
 
         User user = userService.getUserById(userPrincipal.getId());

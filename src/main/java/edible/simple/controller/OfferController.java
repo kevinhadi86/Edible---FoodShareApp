@@ -133,14 +133,13 @@ public class OfferController {
 
     @GetMapping("/all")
     public List<OtherUserOfferResponse> getAllOffer(@CurrentUser UserPrincipal userPrincipal) {
-        User user = userService.getUserById(userPrincipal.getId());
 
         List<Offer> offers = offerService.getAllOffer();
         List<OtherUserOfferResponse> allOffer = new ArrayList<>();
 
         for (Offer offer : offers) {
 
-            if (offer.getUser().getId() != user.getId() && offer.getQuantity()>0) {
+            if (offer.getUser().getId() != userPrincipal.getId() && offer.getQuantity()>0) {
 
                 OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
 
@@ -168,7 +167,7 @@ public class OfferController {
 
         for (Offer offer : offers) {
 
-            if (offer.getUser().getId() != user.getId()) {
+            if (offer.getUser().getId() != user.getId()&& offer.getQuantity()>0) {
 
                 OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
 
@@ -182,7 +181,7 @@ public class OfferController {
     }
 
     @GetMapping("category/{category}")
-    public List<OtherUserOfferResponse> getOfferByCategory(@PathVariable String category) {
+    public List<OtherUserOfferResponse> getOfferByCategory(@CurrentUser UserPrincipal userPrincipal,@PathVariable String category) {
 
         Category searchCategory = categoryService
             .getCategoryByName(CategoryName.getByCode(category));
@@ -191,7 +190,7 @@ public class OfferController {
         List<OtherUserOfferResponse> offersByCategory = new ArrayList<>();
 
         for (Offer offer : offers) {
-            if(offer.getQuantity()>0){
+            if(offer.getUser().getId() != userPrincipal.getId()&&offer.getQuantity()>0){
 
                 OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
 

@@ -143,7 +143,8 @@ public class AuthController {
         String message = "Hello, this is from Edible. This is your new password: " + newPassword;
         userService.sendResetPasswordEmail(user.getEmail(), message);
 
-        return new ResponseEntity(new ApiResponse(true, "Reset password email sent successfully"),
+        return new ResponseEntity(new ApiResponse(true,
+            "Please check your email again, there should be a new about containing your password"),
             HttpStatus.OK);
 
     }

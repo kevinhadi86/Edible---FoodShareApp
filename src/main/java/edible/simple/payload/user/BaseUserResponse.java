@@ -11,7 +11,7 @@ public class BaseUserResponse {
     @Email
     private String email;
     private String phoneNumber;
-    private String imageurl;
+    private String imageUrl;
     private String bio;
     private int rating;
     private String city;
@@ -52,12 +52,12 @@ public class BaseUserResponse {
         this.email = email;
     }
 
-    public String getImageurl() {
-        return imageurl;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImageurl(String imageurl) {
-        this.imageurl = imageurl;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getBio() {
