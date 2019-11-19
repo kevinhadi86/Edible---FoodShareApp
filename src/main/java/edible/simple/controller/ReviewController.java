@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edible.simple.model.dataEnum.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -138,7 +139,7 @@ public class ReviewController {
         if(transaction==null){
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not exists"),
                     HttpStatus.BAD_REQUEST);
-        }else if(!transaction.getStatus().equals("DONE")){
+        }else if(!transaction.getStatus().equals(StatusEnum.DONE)){
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not Done"),
                     HttpStatus.BAD_REQUEST);
         }
