@@ -134,7 +134,7 @@ public class TransactionController {
 
         Offer offer = offerService.getOfferById(request.getOffer_id());
         boolean userCheck = userPrincipal.getId() != offer.getUser().getId();
-        if (userCheck && offer != null && checkTakeTransaction(request, offer)) {
+        if (userCheck && offer != null && checkTakeTransaction(request.getQuantity(), offer)) {
 
             Transaction transaction = new Transaction();
             transaction.setUser(userService.getUserById(userPrincipal.getId()));
@@ -173,15 +173,16 @@ public class TransactionController {
     public ResponseEntity<ApiResponse> updateTransactionToAccepted(@CurrentUser UserPrincipal userPrincipal,
                                                                    @RequestBody UpdateTransactionStatusRequest request) {
         Transaction transaction = transactionService.getTransactionById(request.getId());
+        Offer offer = offerService.getOfferById(transaction.getOffer().getId());
         if (transaction != null && transaction.getStatus() != StatusEnum.DONE
             && transaction.getOffer().getUser().getId() == userPrincipal.getId()
-            && transaction.getStatus() != StatusEnum.REJECTED) {
+            && transaction.getStatus() != StatusEnum.REJECTED
+            && checkTakeTransaction(transaction.getQuantity(), offer)) {
 
             transaction.setStatus(StatusEnum.ACCEPTED);
 
             if (transactionService.saveTransaction(transaction) != null) {
 
-                Offer offer = offerService.getOfferById(transaction.getOffer().getId());
                 offer.setQuantity(offer.getQuantity() - transaction.getQuantity());
 
                 if (offerService.saveOffer(offer) != null) {
@@ -254,7 +255,7 @@ public class TransactionController {
         otherUserOfferResponse.setLocation(transaction.getOffer().getUser().getCity());
     }
 
-    private boolean checkTakeTransaction(AddTransactionRequest request, Offer offer) {
+    private boolean checkTakeTransaction(Float quantity, Offer offer) {
         Date now = new Date();
         String convertDate = new SimpleDateFormat("yyyy-MM-dd").format(offer.getExpiryDate());
         Date expiryDate = null;
@@ -263,14 +264,12 @@ public class TransactionController {
         } catch (ParseException e) {
             logger.info("Failed when save transaction data, because: " + e);
         }
-        if (request.getQuantity() != 0 && offer.getQuantity() - request.getQuantity() >= 0
-            && expiryDate.after(now)) {
+        if (quantity != 0 && offer.getQuantity() - quantity >= 0 && expiryDate.after(now)) {
             return true;
         }
-        logger
-            .info("Failed when save transaction data when checking the take transaction, "
-                  + request.getQuantity() + "," + (offer.getQuantity() - request.getQuantity() >= 0)
-                  + "," + offer.getExpiryDate() +"-,-"+now);
+        logger.info("Failed when save transaction data when checking the take transaction, "
+                    + quantity + "," + (offer.getQuantity() - quantity >= 0) + ","
+                    + offer.getExpiryDate() + "-,-" + now);
         return false;
     }
 
