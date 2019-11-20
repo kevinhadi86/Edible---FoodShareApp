@@ -66,11 +66,13 @@ public class TransactionController {
         List<Transaction> transactions = transactionService.getTransactionByUser(user);
         List<TransactionResponse> myTransaction = new ArrayList<>();
 
+        Date now = new Date();
+        logger.info(now.toString());
         for (Transaction transaction : transactions) {
 
             if ((!transaction.getStatus().equals(StatusEnum.EXPIRED)
                     || !(transaction.getStatus().equals(StatusEnum.DONE)))
-                    && transaction.getPickupTime().before(new Date())) {
+                    && transaction.getPickupTime().before(now)) {
                 transaction.setStatus(StatusEnum.EXPIRED);
                 transactionService.saveTransaction(transaction);
             }
@@ -107,11 +109,13 @@ public class TransactionController {
         List<Transaction> transactions = transactionService.getByOfferUser(user);
         List<TransactionResponse> myTransaction = new ArrayList<>();
 
+        Date now = new Date();
+        logger.info(now.toString());
         for (Transaction transaction : transactions) {
 
             if ((!transaction.getStatus().equals(StatusEnum.EXPIRED)
                  || !(transaction.getStatus().equals(StatusEnum.DONE)))
-                && transaction.getPickupTime().before(new Date())) {
+                && transaction.getPickupTime().before(now)) {
                 transaction.setStatus(StatusEnum.EXPIRED);
                 transactionService.saveTransaction(transaction);
             }
@@ -158,12 +162,17 @@ public class TransactionController {
 
             transaction.setStatus(StatusEnum.INIT);
 
-            Date pickupTime = new Date();
+            Date pickupTime = null;
             try {
                 pickupTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
                     .parse(request.getPickupTime());
             } catch (ParseException e) {
                 logger.info("Failed when save transaction data, because: " + e);
+            }
+            if(pickupTime==null){
+                logger.info("pickup time null");
+                return new ResponseEntity(new ApiResponse(false, "Failed add transaction because pick up time not valid"),
+                        HttpStatus.BAD_REQUEST);
             }
             transaction.setPickupTime(pickupTime);
 
@@ -279,14 +288,14 @@ public class TransactionController {
 
     private boolean checkTakeTransaction(Float quantity, Offer offer) {
         Date now = new Date();
-        String convertDate = new SimpleDateFormat("yyyy-MM-dd").format(offer.getExpiryDate());
-        Date expiryDate = null;
-        try {
-            expiryDate = new SimpleDateFormat("yyyy-MM-dd").parse(convertDate);
-        } catch (ParseException e) {
-            logger.info("Failed when save transaction data, because: " + e);
-        }
-        if (quantity != 0 && offer.getQuantity() - quantity >= 0 && expiryDate.after(now)) {
+//        String convertDate = new SimpleDateFormat("yyyy-MM-dd").format(offer.getExpiryDate());
+//        Date expiryDate = null;
+//        try {
+//            expiryDate = new SimpleDateFormat("yyyy-MM-dd").parse(convertDate);
+//        } catch (ParseException e) {
+//            logger.info("Failed when save transaction data, because: " + e);
+//        }
+        if (quantity != 0 && offer.getQuantity() - quantity >= 0 && offer.getExpiryDate().after(now)) {
             return true;
         }
         logger.info("Failed when save transaction data when checking the take transaction, "
