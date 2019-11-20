@@ -254,7 +254,6 @@ public class TransactionController {
             && transaction.getOffer().getUser().getId() != userPrincipal.getId()) {
 
             transaction.setStatus(StatusEnum.DONE);
-            transaction.setPickupTime(new Date());
 
             if (transactionService.saveTransaction(transaction) != null) {
                 return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
