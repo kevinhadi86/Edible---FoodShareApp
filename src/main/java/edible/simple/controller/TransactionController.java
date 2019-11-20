@@ -68,6 +68,13 @@ public class TransactionController {
 
         for (Transaction transaction : transactions) {
 
+            if ((!transaction.getStatus().equals(StatusEnum.EXPIRED)
+                    || !(transaction.getStatus().equals(StatusEnum.DONE)))
+                    && transaction.getPickupTime().before(new Date())) {
+                transaction.setStatus(StatusEnum.EXPIRED);
+                transactionService.saveTransaction(transaction);
+            }
+
             TransactionResponse transactionResponse = new TransactionResponse();
 
             transactionResponse.setId(transaction.getId());
@@ -101,6 +108,13 @@ public class TransactionController {
         List<TransactionResponse> myTransaction = new ArrayList<>();
 
         for (Transaction transaction : transactions) {
+
+            if ((!transaction.getStatus().equals(StatusEnum.EXPIRED)
+                 || !(transaction.getStatus().equals(StatusEnum.DONE)))
+                && transaction.getPickupTime().before(new Date())) {
+                transaction.setStatus(StatusEnum.EXPIRED);
+                transactionService.saveTransaction(transaction);
+            }
 
             if (transaction.getOffer().getUser().equals(user)) {
                 TransactionResponse transactionResponse = new TransactionResponse();
@@ -203,9 +217,17 @@ public class TransactionController {
         if (transaction != null && transaction.getStatus() != StatusEnum.DONE
             && transaction.getOffer().getUser().getId() == userPrincipal.getId()) {
 
+            Offer offer = transaction.getOffer();
+
+            if (transaction.getStatus().equals(StatusEnum.ACCEPTED)) {
+                offer.setQuantity(offer.getQuantity() + transaction.getQuantity());
+            }
+
             transaction.setStatus(StatusEnum.REJECTED);
 
-            if (transactionService.saveTransaction(transaction) != null) {
+            if (transactionService.saveTransaction(transaction) != null
+                && offerService.saveOffer(offer) != null) {
+
                 return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
                     HttpStatus.OK);
             }

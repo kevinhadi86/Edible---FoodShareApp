@@ -180,6 +180,12 @@ public class ReviewController {
                 userService.saveUser(user);
 
                 logger.info("udah berhasil save di usernya");
+
+                transaction.setStatus(StatusEnum.REVIEWED);
+                transactionService.saveTransaction(transaction);
+
+                logger.info("udah berhasil save di transactionnya");
+
                 return new ResponseEntity<>(new ApiResponse(true, "Success add review"),
                     HttpStatus.OK);
             }

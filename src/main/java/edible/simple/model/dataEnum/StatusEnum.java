@@ -12,6 +12,7 @@ public enum StatusEnum {
     INIT,
     ACCEPTED,
     REJECTED,
-    ONGOING,
-    DONE;
+    EXPIRED,
+    DONE,
+    REVIEWED;
 }
