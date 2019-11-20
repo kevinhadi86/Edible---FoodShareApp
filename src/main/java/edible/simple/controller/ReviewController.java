@@ -175,9 +175,10 @@ public class ReviewController {
                     count++;
                 }
 
-                user.setRating(rating / count);
+                User owner = transaction.getOffer().getUser();
+                owner.setRating(rating / count);
 
-                userService.saveUser(user);
+                userService.saveUser(owner);
 
                 logger.info("udah berhasil save di usernya");
 
