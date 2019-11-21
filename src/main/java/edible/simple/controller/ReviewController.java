@@ -188,12 +188,17 @@ public class ReviewController {
 
                 List<Review> reviews = reviewService.getReviewByUser(owner);
 
-                for (Review allReview : reviews) {
-                    rating += allReview.getRating();
-                    count++;
+                if(reviews != null){
+                    for (Review allReview : reviews) {
+                        rating += allReview.getRating();
+                        count++;
+                    }
+                    double result = rating/count;
+                    owner.setRating((int)result);
+                }else{
+                    owner.setRating(rating);
                 }
 
-                owner.setRating(rating / count);
 
                 userService.saveUser(owner);
 
