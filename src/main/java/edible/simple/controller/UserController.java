@@ -84,7 +84,7 @@ public class UserController {
         BeanUtils.copyProperties(user, currentUser);
 
         List<ReviewResponse> reviewResponses = new ArrayList<>();
-        List<Review> userReviews = reviewService.getReviewByUser(user);
+        List<Review> userReviews = reviewService.getReviewByOwner(user);
         for (Review review : userReviews) {
             ReviewResponse reviewResponse = new ReviewResponse();
             BeanUtils.copyProperties(review, reviewResponse);

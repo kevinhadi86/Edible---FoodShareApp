@@ -22,5 +22,7 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
 
     List<Review> findAllByUser(User user);
 
+    List<Review> findAllByTransactionUser(User user);
+
     List<Review> findByTransaction(Transaction transaction);
 }
