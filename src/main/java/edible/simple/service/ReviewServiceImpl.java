@@ -36,7 +36,7 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public List<Review> getReviewByOwner(User user) {
-        return reviewRepository.findAllByTransaction_User(user);
+        return reviewRepository.findAllByTransaction_Offer_User(user);
     }
 
     @Override
