@@ -55,37 +55,47 @@ public class ReviewController {
     static Logger      logger = LoggerFactory.getLogger(ReviewController.class);
 
     @GetMapping("/transaction/{id}")
-    public ReviewResponse getReviewByTransaction(@CurrentUser UserPrincipal userPrincipal,
+    public List<ReviewResponse> getReviewByTransaction(@CurrentUser UserPrincipal userPrincipal,
                                                  @PathVariable String id) {
+        List<ReviewResponse> reviewResponseList = new ArrayList<>();
+
         Transaction transaction = transactionService.getTransactionById(Long.parseLong(id));
         if (transaction != null
             && (transaction.getUser().getId() == userPrincipal.getId()
                 || transaction.getOffer().getUser().getId() == userPrincipal.getId())) {
-            Review review = reviewService.getReviewByTransaction(transaction);
+            List<Review> reviewList = reviewService.getReviewByTransaction(transaction);
 
-            ReviewResponse reviewResponse = new ReviewResponse();
-            reviewResponse.setId(review.getId());
-            reviewResponse.setRating(review.getRating());
-            reviewResponse.setReview(review.getReview());
+            for (Review review : reviewList){
+                ReviewResponse reviewResponse = new ReviewResponse();
+                reviewResponse.setId(review.getId());
+                reviewResponse.setRating(review.getRating());
+                reviewResponse.setReview(review.getReview());
 
-            TransactionResponse transactionResponse = new TransactionResponse();
-            BeanUtils.copyProperties(review.getTransaction(), transactionResponse);
+                TransactionResponse transactionResponse = new TransactionResponse();
+                BeanUtils.copyProperties(review.getTransaction(), transactionResponse);
 
-            BaseUserResponse baseUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(review.getTransaction().getUser(), baseUserResponse);
-            transactionResponse.setUser(baseUserResponse);
+                BaseUserResponse baseUserResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(review.getTransaction().getUser(), baseUserResponse);
+                transactionResponse.setUser(baseUserResponse);
 
-            OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
-            BeanUtils.copyProperties(review.getTransaction().getOffer(), otherUserOfferResponse);
-            BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),
-                baseOfferUserResponse);
-            otherUserOfferResponse.setUser(baseOfferUserResponse);
-            transactionResponse.setOffer(otherUserOfferResponse);
+                OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
+                BeanUtils.copyProperties(review.getTransaction().getOffer(), otherUserOfferResponse);
+                BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),
+                        baseOfferUserResponse);
+                otherUserOfferResponse.setUser(baseOfferUserResponse);
+                transactionResponse.setOffer(otherUserOfferResponse);
 
-            reviewResponse.setTransaction(transactionResponse);
+                reviewResponse.setTransaction(transactionResponse);
 
-            return reviewResponse;
+                BaseUserResponse fillerUserResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(review.getTransaction().getUser(), fillerUserResponse);
+                reviewResponse.setUser(fillerUserResponse);
+
+                reviewResponseList.add(reviewResponse);
+            }
+
+            return reviewResponseList;
         }
 
         return null;
@@ -152,10 +162,10 @@ public class ReviewController {
         User owner = null;
         if (user.getId() == transaction.getOffer().getUser().getId()) {
             owner = transaction.getUser();
-            logger.info("Owner: " + owner.getId());
+            logger.info("Owner: " + owner.getUsername());
         } else if (user.getId() == transaction.getUser().getId()) {
             owner = transaction.getOffer().getUser();
-            logger.info("Owner: " + owner.getId());
+            logger.info("Owner: " + owner.getUsername());
         } else {
             logger.info("Owner: null");
             return new ResponseEntity(
@@ -164,7 +174,7 @@ public class ReviewController {
         }
 
         List<Review> currentReview = reviewService.getReviewByTransaction(transaction);
-        if (currentReview.size() > 2) {
+        if (currentReview.size() >= 2) {
             logger.info("revienwya udah penuh");
             return new ResponseEntity(new ApiResponse(false, "Review reached max already"),
                 HttpStatus.BAD_REQUEST);

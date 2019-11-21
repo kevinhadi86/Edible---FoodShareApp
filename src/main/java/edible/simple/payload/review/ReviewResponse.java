@@ -5,6 +5,7 @@
 package edible.simple.payload.review;
 
 import edible.simple.payload.transcation.TransactionResponse;
+import edible.simple.payload.user.BaseUserResponse;
 
 /**
  * @author Kevin Hadinata
@@ -17,6 +18,7 @@ public class ReviewResponse {
     private Float rating;
     private String review;
     private String date;
+    private BaseUserResponse user;
 
     public Long getId() {
         return id;
@@ -56,5 +58,13 @@ public class ReviewResponse {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public BaseUserResponse getUser() {
+        return user;
+    }
+
+    public void setUser(BaseUserResponse user) {
+        this.user = user;
     }
 }
