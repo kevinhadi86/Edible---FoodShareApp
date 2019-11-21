@@ -11,6 +11,8 @@ import edible.simple.payload.review.ReviewResponse;
 import edible.simple.payload.transcation.TransactionResponse;
 import edible.simple.payload.user.*;
 import edible.simple.service.ReviewService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,6 +55,8 @@ public class UserController {
     @Autowired
     ReviewService   reviewService;
 
+    static Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public BaseUserResponse getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
@@ -84,25 +88,29 @@ public class UserController {
 
         List<ReviewResponse> reviewResponses = new ArrayList<>();
         List<Review> userReviews = reviewService.getReviewByOwner(user);
-        for (Review review : userReviews) {
-            ReviewResponse reviewResponse = new ReviewResponse();
-            BeanUtils.copyProperties(review, reviewResponse);
+        if(userReviews.size()>0){
+            for (Review review : userReviews) {
+                ReviewResponse reviewResponse = new ReviewResponse();
+                BeanUtils.copyProperties(review, reviewResponse);
 
-            BaseUserResponse baseUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(user,baseUserResponse);
-            reviewResponse.setUser(baseUserResponse);
+                BaseUserResponse baseUserResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(user,baseUserResponse);
+                reviewResponse.setUser(baseUserResponse);
 
-            TransactionResponse transactionResponse = new TransactionResponse();
-            BeanUtils.copyProperties(review.getTransaction(),transactionResponse);
-            reviewResponse.setTransaction(transactionResponse);
+                TransactionResponse transactionResponse = new TransactionResponse();
+                BeanUtils.copyProperties(review.getTransaction(),transactionResponse);
+                reviewResponse.setTransaction(transactionResponse);
 
-            Date createdDate = Date.from(review.getCreatedAt());
-            String formattedDate = new SimpleDateFormat("dd MMM yyyy").format(createdDate);
-            reviewResponse.setDate(formattedDate);
+                Date createdDate = Date.from(review.getCreatedAt());
+                String formattedDate = new SimpleDateFormat("dd MMM yyyy").format(createdDate);
+                reviewResponse.setDate(formattedDate);
 
-            reviewResponses.add(reviewResponse);
+                reviewResponses.add(reviewResponse);
+                logger.info(review.toString());
+            }
+            currentUser.setReviewResponse(reviewResponses);
         }
-        currentUser.setReviewResponse(reviewResponses);
+
 
         return currentUser;
     }
