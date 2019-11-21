@@ -193,7 +193,15 @@ public class ReviewController {
                         rating += allReview.getRating();
                         count++;
                     }
-                    double result = rating/count;
+
+                    double result = 0;
+                    if(count!=0){
+                        result = rating/count;
+                    }else{
+                        result = rating;
+                    }
+
+
                     owner.setRating((int)result);
                 }else{
                     owner.setRating(rating);
