@@ -8,6 +8,7 @@ import edible.simple.model.Category;
 import edible.simple.model.Review;
 import edible.simple.model.dataEnum.CategoryName;
 import edible.simple.payload.review.ReviewResponse;
+import edible.simple.payload.transcation.TransactionResponse;
 import edible.simple.payload.user.*;
 import edible.simple.service.ReviewService;
 import org.springframework.beans.BeanUtils;
@@ -26,10 +27,8 @@ import edible.simple.service.CategoryService;
 import edible.simple.service.StorageService;
 import edible.simple.service.UserService;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author Kevin Hadinata
@@ -88,6 +87,18 @@ public class UserController {
         for (Review review : userReviews) {
             ReviewResponse reviewResponse = new ReviewResponse();
             BeanUtils.copyProperties(review, reviewResponse);
+
+            BaseUserResponse baseUserResponse = new BaseUserResponse();
+            BeanUtils.copyProperties(user,baseUserResponse);
+            reviewResponse.setUser(baseUserResponse);
+
+            TransactionResponse transactionResponse = new TransactionResponse();
+            BeanUtils.copyProperties(review.getTransaction(),transactionResponse);
+            reviewResponse.setTransaction(transactionResponse);
+
+            Date createdDate = Date.from(review.getCreatedAt());
+            String formattedDate = new SimpleDateFormat("dd MMM yyyy").format(createdDate);
+            reviewResponse.setDate(formattedDate);
 
             reviewResponses.add(reviewResponse);
         }
