@@ -20,6 +20,6 @@ public interface ReviewService {
 
     public List<Review> getReviewByUser(User user);
 
-    public Review getReviewByTransaction(Transaction transaction);
+    public List<Review> getReviewByTransaction(Transaction transaction);
 
 }

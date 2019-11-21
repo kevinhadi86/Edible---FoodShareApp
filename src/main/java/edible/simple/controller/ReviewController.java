@@ -139,7 +139,8 @@ public class ReviewController {
         if (transaction == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not exists"),
                 HttpStatus.BAD_REQUEST);
-        } else if (!(transaction.getStatus().equals(StatusEnum.DONE) || transaction.getStatus().equals(StatusEnum.REVIEWED))) {
+        } else if (!(transaction.getStatus().equals(StatusEnum.DONE)
+                     || transaction.getStatus().equals(StatusEnum.REVIEWED))) {
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not Done"),
                 HttpStatus.BAD_REQUEST);
         }
@@ -149,25 +150,35 @@ public class ReviewController {
         User user = userService.getUserById(userPrincipal.getId());
 
         User owner = null;
-        if(user.getId() == transaction.getOffer().getUser().getId()){
-            logger.info("Owner: "+user.getId());
+        if (user.getId() == transaction.getOffer().getUser().getId()) {
             owner = transaction.getUser();
-        }else if(user.getId() == transaction.getUser().getId()){
-            logger.info("Owner: "+user.getId());
+            logger.info("Owner: " + owner.getId());
+        } else if (user.getId() == transaction.getUser().getId()) {
             owner = transaction.getOffer().getUser();
-        }else{
+            logger.info("Owner: " + owner.getId());
+        } else {
             logger.info("Owner: null");
-            return new ResponseEntity(new ApiResponse(false, "You're not eligible to fill the review"),
-                    HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(
+                new ApiResponse(false, "You're not eligible to fill the review"),
+                HttpStatus.BAD_REQUEST);
         }
 
-        Review currentReview = reviewService.getReviewByTransaction(transaction);
-        if (currentReview != null) {
-            if (currentReview.getUser().getId() == user.getId()) {
+        List<Review> currentReview = reviewService.getReviewByTransaction(transaction);
+        if (currentReview.size() > 2) {
+            logger.info("revienwya udah penuh");
+            return new ResponseEntity(new ApiResponse(false, "Review reached max already"),
+                HttpStatus.BAD_REQUEST);
+        }
 
-                logger.info("revienwya udah ada");
-                return new ResponseEntity(new ApiResponse(false, "Review already done before"),
-                    HttpStatus.BAD_REQUEST);
+        if (currentReview.size() != 0) {
+            for (Review eachReview : currentReview) {
+                if (eachReview.getUser().getId() == user.getId()) {
+
+                    logger.info("reviewnya udah ada");
+                    return new ResponseEntity(new ApiResponse(false, "Review already done before"),
+                        HttpStatus.BAD_REQUEST);
+                }
+
             }
         }
 
@@ -185,28 +196,25 @@ public class ReviewController {
                 int rating = 0;
                 int count = 0;
 
-
                 List<Review> reviews = reviewService.getReviewByUser(owner);
 
-                if(reviews != null){
+                if (reviews != null) {
                     for (Review allReview : reviews) {
                         rating += allReview.getRating();
                         count++;
                     }
 
                     double result = 0;
-                    if(count!=0){
-                        result = rating/count;
-                    }else{
+                    if (count != 0) {
+                        result = rating / count;
+                    } else {
                         result = rating;
                     }
 
-
-                    owner.setRating((int)result);
-                }else{
+                    owner.setRating((int) result);
+                } else {
                     owner.setRating(rating);
                 }
-
 
                 userService.saveUser(owner);
 

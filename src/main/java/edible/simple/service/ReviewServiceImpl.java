@@ -35,7 +35,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public Review getReviewByTransaction(Transaction transaction) {
+    public List<Review> getReviewByTransaction(Transaction transaction) {
         return reviewRepository.findByTransaction(transaction);
     }
 }
