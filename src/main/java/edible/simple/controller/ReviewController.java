@@ -139,7 +139,7 @@ public class ReviewController {
         if (transaction == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not exists"),
                 HttpStatus.BAD_REQUEST);
-        } else if (!transaction.getStatus().equals(StatusEnum.DONE)) {
+        } else if (!(transaction.getStatus().equals(StatusEnum.DONE) || transaction.getStatus().equals(StatusEnum.REVIEWED))) {
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not Done"),
                 HttpStatus.BAD_REQUEST);
         }

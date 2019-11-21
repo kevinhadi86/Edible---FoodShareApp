@@ -71,8 +71,9 @@ public class TransactionController {
         for (Transaction transaction : transactions) {
 
             if ((!transaction.getStatus().equals(StatusEnum.EXPIRED)
-                    || !(transaction.getStatus().equals(StatusEnum.DONE)))
-                    && transaction.getPickupTime().before(now)) {
+                 || !(transaction.getStatus().equals(StatusEnum.DONE))
+                 || !(transaction.getStatus().equals(StatusEnum.REVIEWED)))
+                && transaction.getPickupTime().before(now)) {
                 transaction.setStatus(StatusEnum.EXPIRED);
                 transactionService.saveTransaction(transaction);
             }
@@ -114,7 +115,8 @@ public class TransactionController {
         for (Transaction transaction : transactions) {
 
             if ((!transaction.getStatus().equals(StatusEnum.EXPIRED)
-                 || !(transaction.getStatus().equals(StatusEnum.DONE)))
+                 || !(transaction.getStatus().equals(StatusEnum.DONE))
+                 || !(transaction.getStatus().equals(StatusEnum.REVIEWED)))
                 && transaction.getPickupTime().before(now)) {
                 transaction.setStatus(StatusEnum.EXPIRED);
                 transactionService.saveTransaction(transaction);
@@ -169,10 +171,11 @@ public class TransactionController {
             } catch (ParseException e) {
                 logger.info("Failed when save transaction data, because: " + e);
             }
-            if(pickupTime==null){
+            if (pickupTime == null) {
                 logger.info("pickup time null");
-                return new ResponseEntity(new ApiResponse(false, "Failed add transaction because pick up time not valid"),
-                        HttpStatus.BAD_REQUEST);
+                return new ResponseEntity(
+                    new ApiResponse(false, "Failed add transaction because pick up time not valid"),
+                    HttpStatus.BAD_REQUEST);
             }
             transaction.setPickupTime(pickupTime);
 
@@ -197,9 +200,8 @@ public class TransactionController {
                                                                    @RequestBody UpdateTransactionStatusRequest request) {
         Transaction transaction = transactionService.getTransactionById(request.getId());
         Offer offer = offerService.getOfferById(transaction.getOffer().getId());
-        if (transaction != null && transaction.getStatus() != StatusEnum.DONE
-            && transaction.getOffer().getUser().getId() == userPrincipal.getId()
-            && transaction.getStatus() != StatusEnum.REJECTED
+        if (transaction != null && transaction.getOffer().getUser().getId() == userPrincipal.getId()
+            && transaction.getStatus() == StatusEnum.INIT
             && checkTakeTransaction(transaction.getQuantity(), offer)) {
 
             transaction.setStatus(StatusEnum.ACCEPTED);
@@ -224,6 +226,7 @@ public class TransactionController {
                                                                    @RequestBody UpdateTransactionStatusRequest request) {
         Transaction transaction = transactionService.getTransactionById(request.getId());
         if (transaction != null && transaction.getStatus() != StatusEnum.DONE
+            && transaction.getStatus() != StatusEnum.EXPIRED
             && transaction.getOffer().getUser().getId() == userPrincipal.getId()) {
 
             Offer offer = transaction.getOffer();
@@ -287,14 +290,9 @@ public class TransactionController {
 
     private boolean checkTakeTransaction(Float quantity, Offer offer) {
         Date now = new Date();
-//        String convertDate = new SimpleDateFormat("yyyy-MM-dd").format(offer.getExpiryDate());
-//        Date expiryDate = null;
-//        try {
-//            expiryDate = new SimpleDateFormat("yyyy-MM-dd").parse(convertDate);
-//        } catch (ParseException e) {
-//            logger.info("Failed when save transaction data, because: " + e);
-//        }
-        if (quantity != 0 && offer.getQuantity() - quantity >= 0 && offer.getExpiryDate().after(now)) {
+
+        if (quantity != 0 && offer.getQuantity() - quantity >= 0
+            && offer.getExpiryDate().after(now)) {
             return true;
         }
         logger.info("Failed when save transaction data when checking the take transaction, "
