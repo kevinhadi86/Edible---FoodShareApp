@@ -21,6 +21,9 @@ public class Review extends DataAudit{
     @ManyToOne
     @JoinColumn(name = "transaction_id", nullable = false)
     private Transaction transaction;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     @NotNull
     private Float rating;
     @NotNull
@@ -40,6 +43,14 @@ public class Review extends DataAudit{
 
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Float getRating() {

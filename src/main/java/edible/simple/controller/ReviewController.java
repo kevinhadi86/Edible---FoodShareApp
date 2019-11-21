@@ -136,31 +136,48 @@ public class ReviewController {
         Transaction transaction = transactionService
             .getTransactionById(addReviewRequest.getTransactionId());
 
-        if(transaction==null){
+        if (transaction == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not exists"),
-                    HttpStatus.BAD_REQUEST);
-        }else if(!transaction.getStatus().equals(StatusEnum.DONE)){
+                HttpStatus.BAD_REQUEST);
+        } else if (!transaction.getStatus().equals(StatusEnum.DONE)) {
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not Done"),
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        logger.info("transaction: "+transaction.toString());
-
-        User user = userService.getUserById(userPrincipal.getId());
-
-        Review currentReview = reviewService.getReviewByTransaction(transaction);
-        if (currentReview != null) {
-            logger.info("revienwya udah ada");
-            return new ResponseEntity(new ApiResponse(false, "Review already done before"),
                 HttpStatus.BAD_REQUEST);
         }
 
-        if (transaction != null && transaction.getUser() == user) {
+        logger.info("transaction: " + transaction.toString());
+
+        User user = userService.getUserById(userPrincipal.getId());
+
+        User owner = null;
+        if(user.getId() == transaction.getOffer().getUser().getId()){
+            logger.info("Owner: "+user.getId());
+            owner = transaction.getUser();
+        }else if(user.getId() == transaction.getUser().getId()){
+            logger.info("Owner: "+user.getId());
+            owner = transaction.getOffer().getUser();
+        }else{
+            logger.info("Owner: null");
+            return new ResponseEntity(new ApiResponse(false, "You're not eligible to fill the review"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        Review currentReview = reviewService.getReviewByTransaction(transaction);
+        if (currentReview != null) {
+            if (currentReview.getUser().getId() == user.getId()) {
+
+                logger.info("revienwya udah ada");
+                return new ResponseEntity(new ApiResponse(false, "Review already done before"),
+                    HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        if (transaction != null && owner != null) {
             logger.info("start generate review");
             Review review = new Review();
             review.setRating(addReviewRequest.getRating());
             review.setReview(addReviewRequest.getReview());
             review.setTransaction(transaction);
+            review.setUser(user);
 
             if (reviewService.addReview(review) != null) {
 
@@ -168,14 +185,14 @@ public class ReviewController {
                 int rating = 0;
                 int count = 0;
 
-                List<Review> reviews = reviewService.getReviewByUser(user);
+
+                List<Review> reviews = reviewService.getReviewByUser(owner);
 
                 for (Review allReview : reviews) {
                     rating += allReview.getRating();
                     count++;
                 }
 
-                User owner = transaction.getOffer().getUser();
                 owner.setRating(rating / count);
 
                 userService.saveUser(owner);
