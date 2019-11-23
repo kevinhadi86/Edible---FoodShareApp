@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edible.simple.model.*;
+import edible.simple.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -18,10 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import edible.simple.model.Offer;
-import edible.simple.model.OfferImage;
-import edible.simple.model.Transaction;
-import edible.simple.model.User;
 import edible.simple.model.dataEnum.StatusEnum;
 import edible.simple.payload.ApiResponse;
 import edible.simple.payload.offer.OtherUserOfferResponse;
@@ -31,10 +29,6 @@ import edible.simple.payload.transcation.UpdateTransactionStatusRequest;
 import edible.simple.payload.user.BaseUserResponse;
 import edible.simple.security.CurrentUser;
 import edible.simple.security.UserPrincipal;
-import edible.simple.service.OfferService;
-import edible.simple.service.TransactionService;
-import edible.simple.service.UnitService;
-import edible.simple.service.UserService;
 
 /**
  * @author Kevin Hadinata
@@ -55,6 +49,9 @@ public class TransactionController {
 
     @Autowired
     UnitService        unitService;
+
+    @Autowired
+    ReviewService      reviewService;
 
     static Logger      logger = LoggerFactory.getLogger(TransactionController.class);
 
@@ -141,6 +138,11 @@ public class TransactionController {
                 fillOfferResponse(otherUserOfferResponse, transaction);
 
                 transactionResponse.setOffer(otherUserOfferResponse);
+
+                List<Review> thisReview = reviewService.getReviewByTransaction(transaction);
+                if(thisReview.size()==1 && thisReview.get(0).getUser().getId()==userPrincipal.getId()){
+                    transactionResponse.setStatus(StatusEnum.REVIEWED.name());
+                }
 
                 myTransaction.add(transactionResponse);
             }

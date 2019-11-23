@@ -56,7 +56,7 @@ public class ReviewController {
 
     @GetMapping("/transaction/{id}")
     public List<ReviewResponse> getReviewByTransaction(@CurrentUser UserPrincipal userPrincipal,
-                                                 @PathVariable String id) {
+                                                       @PathVariable String id) {
         List<ReviewResponse> reviewResponseList = new ArrayList<>();
 
         Transaction transaction = transactionService.getTransactionById(Long.parseLong(id));
@@ -65,7 +65,7 @@ public class ReviewController {
                 || transaction.getOffer().getUser().getId() == userPrincipal.getId())) {
             List<Review> reviewList = reviewService.getReviewByTransaction(transaction);
 
-            for (Review review : reviewList){
+            for (Review review : reviewList) {
                 ReviewResponse reviewResponse = new ReviewResponse();
                 reviewResponse.setId(review.getId());
                 reviewResponse.setRating(review.getRating());
@@ -79,10 +79,11 @@ public class ReviewController {
                 transactionResponse.setUser(baseUserResponse);
 
                 OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
-                BeanUtils.copyProperties(review.getTransaction().getOffer(), otherUserOfferResponse);
+                BeanUtils.copyProperties(review.getTransaction().getOffer(),
+                    otherUserOfferResponse);
                 BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
                 BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),
-                        baseOfferUserResponse);
+                    baseOfferUserResponse);
                 otherUserOfferResponse.setUser(baseOfferUserResponse);
                 transactionResponse.setOffer(otherUserOfferResponse);
 
@@ -105,36 +106,39 @@ public class ReviewController {
     public List<ReviewResponse> getMyReview(@CurrentUser UserPrincipal userPrincipal) {
         User user = userService.getUserById(userPrincipal.getId());
 
-        List<Review> reviews = reviewService.getReviewByUser(user);
+        List<Review> reviews = reviewService.getMyReview(user);
         List<ReviewResponse> myReview = new ArrayList<>();
         for (Review review : reviews) {
-            ReviewResponse reviewResponse = new ReviewResponse();
-            reviewResponse.setId(review.getId());
-            reviewResponse.setRating(review.getRating());
-            reviewResponse.setReview(review.getReview());
+            if (review.getUser().getId() != user.getId()) {
+                ReviewResponse reviewResponse = new ReviewResponse();
+                reviewResponse.setId(review.getId());
+                reviewResponse.setRating(review.getRating());
+                reviewResponse.setReview(review.getReview());
 
-            Date createdDate = Date.from(review.getCreatedAt());
-            String formattedDate = new SimpleDateFormat("dd MMM yyyy").format(createdDate);
-            reviewResponse.setDate(formattedDate);
+                Date createdDate = Date.from(review.getCreatedAt());
+                String formattedDate = new SimpleDateFormat("dd MMM yyyy").format(createdDate);
+                reviewResponse.setDate(formattedDate);
 
-            TransactionResponse transactionResponse = new TransactionResponse();
-            BeanUtils.copyProperties(review.getTransaction(), transactionResponse);
+                TransactionResponse transactionResponse = new TransactionResponse();
+                BeanUtils.copyProperties(review.getTransaction(), transactionResponse);
 
-            BaseUserResponse baseUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(review.getTransaction().getUser(), baseUserResponse);
-            transactionResponse.setUser(baseUserResponse);
+                BaseUserResponse baseUserResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(review.getTransaction().getUser(), baseUserResponse);
+                transactionResponse.setUser(baseUserResponse);
 
-            OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
-            BeanUtils.copyProperties(review.getTransaction().getOffer(), otherUserOfferResponse);
-            BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
-            BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),
-                baseOfferUserResponse);
-            otherUserOfferResponse.setUser(baseOfferUserResponse);
-            transactionResponse.setOffer(otherUserOfferResponse);
+                OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
+                BeanUtils.copyProperties(review.getTransaction().getOffer(),
+                    otherUserOfferResponse);
+                BaseUserResponse baseOfferUserResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(review.getTransaction().getOffer().getUser(),
+                    baseOfferUserResponse);
+                otherUserOfferResponse.setUser(baseOfferUserResponse);
+                transactionResponse.setOffer(otherUserOfferResponse);
 
-            reviewResponse.setTransaction(transactionResponse);
+                reviewResponse.setTransaction(transactionResponse);
 
-            myReview.add(reviewResponse);
+                myReview.add(reviewResponse);
+            }
         }
         return myReview;
     }
@@ -149,98 +153,91 @@ public class ReviewController {
         if (transaction == null) {
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not exists"),
                 HttpStatus.BAD_REQUEST);
-        } else if (!(transaction.getStatus().equals(StatusEnum.DONE)
-                     || transaction.getStatus().equals(StatusEnum.REVIEWED))) {
+        } else if( transaction.getStatus().equals(StatusEnum.REVIEWED)){
+            return new ResponseEntity<>(new ApiResponse(false, "Transaction Reviewed"),
+                    HttpStatus.BAD_REQUEST);
+        } else if (!transaction.getStatus().equals(StatusEnum.DONE)) {
             return new ResponseEntity<>(new ApiResponse(false, "Transaction not Done"),
                 HttpStatus.BAD_REQUEST);
         }
 
         logger.info("transaction: " + transaction.toString());
 
-        User user = userService.getUserById(userPrincipal.getId());
-
-        User owner = null;
-        if (user.getId() == transaction.getOffer().getUser().getId()) {
-            owner = transaction.getUser();
-            logger.info("Owner: " + owner.getUsername());
-        } else if (user.getId() == transaction.getUser().getId()) {
-            owner = transaction.getOffer().getUser();
-            logger.info("Owner: " + owner.getUsername());
-        } else {
-            logger.info("Owner: null");
-            return new ResponseEntity(
-                new ApiResponse(false, "You're not eligible to fill the review"),
-                HttpStatus.BAD_REQUEST);
-        }
-
+        boolean isFinalReview = false;
         List<Review> currentReview = reviewService.getReviewByTransaction(transaction);
-        if (currentReview.size() >= 2) {
-            logger.info("revienwya udah penuh");
-            return new ResponseEntity(new ApiResponse(false, "Review reached max already"),
-                HttpStatus.BAD_REQUEST);
-        }
-
         if (currentReview.size() != 0) {
             for (Review eachReview : currentReview) {
-                if (eachReview.getUser().getId() == user.getId()) {
+                if (eachReview.getUser().getId() == userPrincipal.getId()) {
 
                     logger.info("reviewnya udah ada");
                     return new ResponseEntity(new ApiResponse(false, "Review already done before"),
                         HttpStatus.BAD_REQUEST);
                 }
-
+                else{
+                    isFinalReview = true;
+                }
             }
         }
 
-        if (transaction != null && owner != null) {
-            logger.info("start generate review");
-            Review review = new Review();
-            review.setRating(addReviewRequest.getRating());
-            review.setReview(addReviewRequest.getReview());
-            review.setTransaction(transaction);
-            review.setUser(user);
+        User user = userService.getUserById(userPrincipal.getId());
 
-            if (reviewService.addReview(review) != null) {
+        logger.info("start generate review");
+        Review review = new Review();
+        review.setRating(addReviewRequest.getRating());
+        review.setReview(addReviewRequest.getReview());
+        review.setTransaction(transaction);
+        review.setUser(user);
 
-                logger.info("udah berhasil save review");
-                int rating = 0;
-                int count = 0;
+        Review newReview = reviewService.addReview(review);
+        if (newReview != null) {
 
-                List<Review> reviews = reviewService.getReviewByUser(owner);
+            logger.info("udah berhasil save review");
+            int rating = 0;
+            int count = 0;
 
-                if (reviews != null) {
-                    for (Review allReview : reviews) {
-                        rating += allReview.getRating();
-                        count++;
-                    }
+            List<Review> myReviews = new ArrayList<>();
+            User reviewedUser;
+            if(newReview.getUser().getId() == transaction.getOffer().getUser().getId()){
+                reviewedUser = transaction.getUser();
+                myReviews = reviewService.getMyReview(reviewedUser);
+            }else{
+                reviewedUser = transaction.getOffer().getUser();
+                myReviews = reviewService.getMyReview(reviewedUser);
+            }
 
-                    double result = 0;
-                    if (count != 0) {
-                        result = rating / count;
-                    } else {
-                        result = rating;
-                    }
+            if (myReviews == null) {
+                reviewedUser.setRating(rating);
+            }
 
-                    owner.setRating((int) result);
-                } else {
-                    owner.setRating(rating);
-                }
+            for (Review myReview : myReviews) {
+                rating += myReview.getRating();
+                count++;
+            }
 
-                userService.saveUser(owner);
+            double result = 0;
+            if (count != 0) {
+                result = rating / count;
+            } else {
+                result = rating;
+            }
 
-                logger.info("udah berhasil save di usernya");
+            reviewedUser.setRating((int) result);
+
+            userService.saveUser(reviewedUser);
+
+            logger.info("udah berhasil save di usernya");
+
+            if(isFinalReview){
 
                 transaction.setStatus(StatusEnum.REVIEWED);
                 transactionService.saveTransaction(transaction);
-
                 logger.info("udah berhasil save di transactionnya");
 
-                return new ResponseEntity<>(new ApiResponse(true, "Success add review"),
-                    HttpStatus.OK);
             }
+
         }
-        logger.info("gagal checking");
-        return new ResponseEntity<>(new ApiResponse(false, "Failed add review"),
-            HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ApiResponse(true, "Success add review"),
+            HttpStatus.OK);
+
     }
 }

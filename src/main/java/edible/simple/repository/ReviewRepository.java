@@ -20,7 +20,7 @@ import edible.simple.model.User;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review,Long> {
 
-    List<Review> findAllByUser(User user);
+    List<Review> findAllByTransaction_User(User user);
 
     List<Review> findAllByTransaction_Offer_User(User user);
 

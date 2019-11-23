@@ -18,6 +18,8 @@ public interface ReviewService {
 
     public Review addReview(Review review);
 
+    public List<Review> getMyReview(User user);
+
     public List<Review> getReviewByUser(User user);
 
     public List<Review> getReviewByOwner(User user);
