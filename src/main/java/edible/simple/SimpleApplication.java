@@ -22,7 +22,7 @@ public class SimpleApplication {
 
 	@PostConstruct
 	void init() {
-		TimeZone.setDefault(TimeZone.getTimeZone("CST"));
+		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
 	}
 
 	public static void main(String[] args) {
