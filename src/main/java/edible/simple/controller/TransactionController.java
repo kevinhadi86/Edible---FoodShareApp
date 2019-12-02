@@ -299,7 +299,7 @@ public class TransactionController {
         }
         logger.info("Failed when save transaction data when checking the take transaction, "
                     + quantity + "," + (offer.getQuantity() - quantity >= 0) + ","
-                    + offer.getExpiryDate() + "-,-" + now);
+                    + offer.getExpiryDate() + "-,-" + now+"timeCheck: "+offer.getExpiryDate().after(now));
         return false;
     }
 
