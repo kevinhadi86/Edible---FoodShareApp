@@ -20,6 +20,11 @@ import edible.simple.storage.StorageProperties;
 })
 public class SimpleApplication {
 
+	@PostConstruct
+	void init() {
+		TimeZone.setDefault(TimeZone.getTimeZone("CST"));
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(SimpleApplication.class, args);
 	}
