@@ -25,8 +25,6 @@ public interface UserService {
 
     public User getUserById(Long id);
 
-    public List<User> getAllUserByUsername(String username);
-
     public boolean saveUser(User user);
 
     public boolean existsByEmail(String email);

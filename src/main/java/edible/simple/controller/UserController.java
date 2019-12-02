@@ -94,7 +94,7 @@ public class UserController {
                 BeanUtils.copyProperties(review, reviewResponse);
 
                 BaseUserResponse baseUserResponse = new BaseUserResponse();
-                BeanUtils.copyProperties(user,baseUserResponse);
+                BeanUtils.copyProperties(review.getUser(),baseUserResponse);
                 reviewResponse.setUser(baseUserResponse);
 
                 TransactionResponse transactionResponse = new TransactionResponse();

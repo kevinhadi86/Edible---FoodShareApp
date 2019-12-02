@@ -120,11 +120,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUserByUsername(String username) {
-        return userRepository.getAllByUsernameContaining(username);
-    }
-
-    @Override
     public boolean saveUser(User user) {
         if (!userRepository.save(user).equals(null)) {
             return true;
