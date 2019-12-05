@@ -137,6 +137,10 @@ public class ReviewController {
 
                 reviewResponse.setTransaction(transactionResponse);
 
+                BaseUserResponse userResponse = new BaseUserResponse();
+                BeanUtils.copyProperties(review.getUser(),userResponse);
+                reviewResponse.setUser(userResponse);
+
                 myReview.add(reviewResponse);
             }
         }
