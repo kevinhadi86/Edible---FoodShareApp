@@ -26,7 +26,6 @@ public class Review extends DataAudit{
     private User user;
     @NotNull
     private Float rating;
-    @NotNull
     private String review;
 
     public Long getId() {

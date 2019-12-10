@@ -250,6 +250,25 @@ public class TransactionController {
             HttpStatus.BAD_REQUEST);
     }
 
+    @PostMapping("/cancelled")
+    public ResponseEntity<ApiResponse> updateTransactionToCancelled(@CurrentUser UserPrincipal userPrincipal,
+                                                                   @RequestBody UpdateTransactionStatusRequest request) {
+        Transaction transaction = transactionService.getTransactionById(request.getId());
+        if (transaction != null && transaction.getStatus() == StatusEnum.INIT
+                && transaction.getUser().getId() == userPrincipal.getId()) {
+
+            transaction.setStatus(StatusEnum.REJECTED);
+
+            if (transactionService.saveTransaction(transaction) != null) {
+
+                return new ResponseEntity<>(new ApiResponse(true, "Success save transaction"),
+                        HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(new ApiResponse(false, "Failed save transaction"),
+                HttpStatus.BAD_REQUEST);
+    }
+
     @PostMapping("/done")
     public ResponseEntity<ApiResponse> updateTranscationToDone(@CurrentUser UserPrincipal userPrincipal,
                                                                @RequestBody UpdateTransactionStatusRequest request) {

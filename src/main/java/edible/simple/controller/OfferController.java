@@ -139,7 +139,7 @@ public class OfferController {
 
         for (Offer offer : offers) {
 
-            if (offer.getUser().getId() != userPrincipal.getId() && offer.getQuantity()>0) {
+            if (offer.getUser().getId() != userPrincipal.getId() && offer.getQuantity()>0 && offer.getExpiryDate().after(new Date())) {
 
                 OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
 
@@ -167,7 +167,7 @@ public class OfferController {
 
         for (Offer offer : offers) {
 
-            if (offer.getUser().getId() != user.getId()&& offer.getQuantity()>0) {
+            if (offer.getUser().getId() != user.getId()&& offer.getQuantity()>0 && offer.getExpiryDate().after(new Date())) {
 
                 OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
 
@@ -190,7 +190,7 @@ public class OfferController {
         List<OtherUserOfferResponse> offersByCategory = new ArrayList<>();
 
         for (Offer offer : offers) {
-            if(offer.getUser().getId() != userPrincipal.getId()&&offer.getQuantity()>0){
+            if(offer.getUser().getId() != userPrincipal.getId()&&offer.getQuantity()>0 && offer.getExpiryDate().after(new Date())){
 
                 OtherUserOfferResponse otherUserOfferResponse = new OtherUserOfferResponse();
 
