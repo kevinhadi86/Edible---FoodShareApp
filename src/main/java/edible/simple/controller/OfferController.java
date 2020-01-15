@@ -360,6 +360,9 @@ public class OfferController {
         }
         offer.setExpiryDate(expiryTime);
 
+        offer.setCod(false);
+        offer.setDelivery(false);
+
         if (addNewOfferRequest.isCod()) {
 
             offer.setCod(true);
